@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/about"
+        android:title="@string/aboutOption">
+    </item>
+    <item android:title="Options...">
+        <menu>
+            <item android:title="Theme">
+            </item>
+            <item android:title="Settings">
+            </item>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/exit"
+        android:alphabeticShortcut="x"
+        android:title="@string/exitOption">
+    </item>
+    <item android:title="Restart">
+    </item>
+
+</menu>
