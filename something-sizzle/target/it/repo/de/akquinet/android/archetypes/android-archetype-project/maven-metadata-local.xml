@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>de.akquinet.android.archetypes</groupId>
+  <artifactId>android-archetype-project</artifactId>
+  <versioning>
+    <versions>
+      <version>1.0.9-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20120412125145</lastUpdated>
+  </versioning>
+</metadata>
