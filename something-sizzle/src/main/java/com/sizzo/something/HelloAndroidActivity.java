@@ -34,6 +34,9 @@ public class HelloAndroidActivity extends Activity {
 		Log.i(TAG, "onCreate");
 		setContentView(R.layout.main);
 		registerReceiver(getWifiScanReceiver(), new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+		
+		this.getWifiManager().startScan();
+		
 	}
 
 	@Override
