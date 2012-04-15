@@ -2,10 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/about"
-        android:title="@string/aboutOption">
+        android:id="@+id/wifis"
+        android:showAsAction="ifRoom"
+        android:title="@string/wifisOption">
     </item>
-    <item android:title="Options...">
+    <item
+        android:id="@+id/history"
+        android:showAsAction="always"
+        android:title="@string/historyOption">
+    </item>
+    <item
+        android:showAsAction="ifRoom"
+        android:title="Options...">
         <menu>
             <item android:title="Theme">
             </item>
@@ -16,9 +24,8 @@
     <item
         android:id="@+id/exit"
         android:alphabeticShortcut="x"
+        android:showAsAction="ifRoom"
         android:title="@string/exitOption">
-    </item>
-    <item android:title="Restart">
     </item>
 
 </menu>

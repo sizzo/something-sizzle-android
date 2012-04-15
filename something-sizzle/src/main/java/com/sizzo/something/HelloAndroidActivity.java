@@ -1,6 +1,9 @@
 package com.sizzo.something;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.IntentFilter;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -8,10 +11,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.sizzo.something.wifi.WiFiScanReceiver;
+
 public class HelloAndroidActivity extends Activity {
 
 	private static final int ID_MENU_DYNAMIC_USER_HOME = 0;
 	private static String TAG = "something-sizzle";
+	private WiFiScanReceiver wifiScanReceiver;
+	private WifiManager wifiManager;
 
 	/**
 	 * Called when the activity is first created.
@@ -27,23 +34,25 @@ public class HelloAndroidActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, "onCreate");
 		setContentView(R.layout.main);
+		registerReceiver(getWifiScanReceiver(), new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		insertDynamicOptionsMenu(menu);
 		// creates a menu inflater
 		MenuInflater inflater = getMenuInflater();
 		// generates a Menu from a menu resource file
 		// R.menu.main_menu represents the ID of the XML resource file
 		inflater.inflate(R.menu.main_menu, menu);
 
-		appendDynamicOptionsMenu(menu);
 		return true;
 	}
 
-	private void appendDynamicOptionsMenu(Menu menu) {
+	private void insertDynamicOptionsMenu(Menu menu) {
 		// the menu option text is defined in resources
-		menu.add(Menu.NONE, ID_MENU_DYNAMIC_USER_HOME, Menu.NONE, R.string.dynamicUserHomeOption);
+		MenuItem dynamicUserHomeMenuItem = menu.add(Menu.NONE, ID_MENU_DYNAMIC_USER_HOME, Menu.NONE, R.string.dynamicUserHomeOption);
+		dynamicUserHomeMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS );
 	}
 
 	@Override
@@ -57,8 +66,30 @@ public class HelloAndroidActivity extends Activity {
 		} else if (item.getItemId() == ID_MENU_DYNAMIC_USER_HOME) {
 			Toast.makeText(this.getApplicationContext(),
 					"You just select RAINBOW menu, will redirect to rainbow home page", 30).show();
+		} else if (item.getItemId() == R.id.wifis) {
+			Toast.makeText(this.getApplicationContext(),
+					"You just select WIFIs menu, will scan the wifis and show them in list", 30).show();
+		       getWifiManager().startScan();
+		} else if (item.getItemId() == R.id.history) {
+			Toast.makeText(this.getApplicationContext(),
+					"You just select History menu, will list your history", 30).show();
 		}
 		return false;
+	}
+
+	public WiFiScanReceiver getWifiScanReceiver() {
+		if (wifiScanReceiver == null) {
+			wifiScanReceiver = new WiFiScanReceiver();
+		}
+		return wifiScanReceiver;
+	}
+
+
+	public WifiManager getWifiManager() {
+		if(wifiManager == null){
+		wifiManager =  (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		}
+		return wifiManager;
 	}
 
 }

@@ -2,10 +2,13 @@
 <resources>
     <string name="hello">Hello something-sizzle!</string>
     <string name="app_name">something-sizzle</string>
-
-    <string name="exitOption">Exit</string>
-    <string name="aboutOption">About</string>
+    
     <string name="dynamicUserHomeOption">Rainbow</string>
+    
+    <string name="exitOption">Exit</string>
+    <string name="historyOption">History</string>
+    <string name="wifisOption">Wifis</string>
+    
     
     
     </resources>
