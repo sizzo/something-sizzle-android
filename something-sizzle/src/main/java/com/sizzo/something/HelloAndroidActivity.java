@@ -15,7 +15,6 @@ import com.sizzo.something.wifi.WiFiScanReceiver;
 
 public class HelloAndroidActivity extends Activity {
 
-	private static final int ID_MENU_DYNAMIC_USER_HOME = 0;
 	private static String TAG = "something-sizzle";
 	private WiFiScanReceiver wifiScanReceiver;
 	private WifiManager wifiManager;
@@ -39,7 +38,6 @@ public class HelloAndroidActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		insertDynamicOptionsMenu(menu);
 		// creates a menu inflater
 		MenuInflater inflater = getMenuInflater();
 		// generates a Menu from a menu resource file
@@ -49,30 +47,20 @@ public class HelloAndroidActivity extends Activity {
 		return true;
 	}
 
-	private void insertDynamicOptionsMenu(Menu menu) {
-		// the menu option text is defined in resources
-		MenuItem dynamicUserHomeMenuItem = menu.add(Menu.NONE, ID_MENU_DYNAMIC_USER_HOME, Menu.NONE, R.string.dynamicUserHomeOption);
-		dynamicUserHomeMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS );
-	}
-
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// check selected menu item
-		// R.id.exit is @+id/exit
-		if (item.getItemId() == R.id.exit) {
-			// close the Activity
-			this.finish();
-			return true;
-		} else if (item.getItemId() == ID_MENU_DYNAMIC_USER_HOME) {
+
+		if (item.getItemId() == R.id.dynamicUserHome) {
 			Toast.makeText(this.getApplicationContext(),
 					"You just select RAINBOW menu, will redirect to rainbow home page", 30).show();
 		} else if (item.getItemId() == R.id.wifis) {
 			Toast.makeText(this.getApplicationContext(),
 					"You just select WIFIs menu, will scan the wifis and show them in list", 30).show();
-		       getWifiManager().startScan();
+			getWifiManager().startScan();
 		} else if (item.getItemId() == R.id.history) {
-			Toast.makeText(this.getApplicationContext(),
-					"You just select History menu, will list your history", 30).show();
+			Toast.makeText(this.getApplicationContext(), "You just select History menu, will list your history", 30)
+					.show();
 		}
 		return false;
 	}
@@ -84,10 +72,9 @@ public class HelloAndroidActivity extends Activity {
 		return wifiScanReceiver;
 	}
 
-
 	public WifiManager getWifiManager() {
-		if(wifiManager == null){
-		wifiManager =  (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		if (wifiManager == null) {
+			wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		}
 		return wifiManager;
 	}

@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/dynamicUserHome"
+        android:showAsAction="ifRoom"
+        android:title="@string/dynamicUserHomeOption">
+    </item>
+    <item
         android:id="@+id/wifis"
         android:showAsAction="ifRoom"
         android:title="@string/wifisOption">
@@ -13,19 +18,16 @@
     </item>
     <item
         android:showAsAction="ifRoom"
-        android:title="Options...">
+        android:title="Tools...">
         <menu>
+            <item android:title="Barcode">
+            </item>
             <item android:title="Theme">
             </item>
             <item android:title="Settings">
             </item>
         </menu>
     </item>
-    <item
-        android:id="@+id/exit"
-        android:alphabeticShortcut="x"
-        android:showAsAction="ifRoom"
-        android:title="@string/exitOption">
-    </item>
+    
 
 </menu>
