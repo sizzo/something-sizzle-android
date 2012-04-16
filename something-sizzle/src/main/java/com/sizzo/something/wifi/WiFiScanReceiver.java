@@ -20,13 +20,11 @@ import com.sizzo.something.HelloAndroidActivity;
 public class WiFiScanReceiver extends BroadcastReceiver {
 	private static final String TAG = "WiFiScanReceiver";
 	private HelloAndroidActivity helloAndroidActivity;
-	private ListView listView1;
 
 	public WiFiScanReceiver(HelloAndroidActivity activity) {
 		super();
 		this.helloAndroidActivity = activity;
-		listView1 = this.helloAndroidActivity.getListView1();
-		listView1.setOnItemClickListener(new OnItemClickListener() {
+		 helloAndroidActivity.getWifiListView().setOnItemClickListener(new OnItemClickListener() {
     		@Override
     		public void onItemClick(AdapterView<?> parent, View view,
     			int position, long id) {
@@ -49,7 +47,7 @@ public class WiFiScanReceiver extends BroadcastReceiver {
 		String message = String.format("%s networks found. %s is the strongest.", wifiList.size(), bestSignal.SSID);
 		Toast.makeText(c, message, Toast.LENGTH_LONG).show();
 
-		listView1.setAdapter(new ArrayAdapter<ScanResult>(c, android.R.layout.test_list_item , wifiList));
+		helloAndroidActivity.getWifiListView().setAdapter(new ArrayAdapter<ScanResult>(c, android.R.layout.test_list_item , wifiList));
 
 		Log.d(TAG, "onReceive() message: " + message);
 	}
