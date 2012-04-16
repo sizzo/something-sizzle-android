@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.sizzo.something.wifi.WiFiScanReceiver;
@@ -18,6 +19,7 @@ public class HelloAndroidActivity extends Activity {
 	private static String TAG = "something-sizzle";
 	private WiFiScanReceiver wifiScanReceiver;
 	private WifiManager wifiManager;
+    private ListView listView1;
 
 	/**
 	 * Called when the activity is first created.
@@ -36,7 +38,8 @@ public class HelloAndroidActivity extends Activity {
 		registerReceiver(getWifiScanReceiver(), new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
 		
 		this.getWifiManager().startScan();
-		
+	       listView1 = (ListView)findViewById(R.id.listView1);
+
 	}
 
 	@Override
@@ -70,7 +73,7 @@ public class HelloAndroidActivity extends Activity {
 
 	public WiFiScanReceiver getWifiScanReceiver() {
 		if (wifiScanReceiver == null) {
-			wifiScanReceiver = new WiFiScanReceiver();
+			wifiScanReceiver = new WiFiScanReceiver(this);
 		}
 		return wifiScanReceiver;
 	}
@@ -80,6 +83,10 @@ public class HelloAndroidActivity extends Activity {
 			wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		}
 		return wifiManager;
+	}
+
+	public ListView getListView1() {
+		return listView1;
 	}
 
 }
