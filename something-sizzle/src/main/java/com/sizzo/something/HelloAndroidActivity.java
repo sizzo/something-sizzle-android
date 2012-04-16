@@ -19,7 +19,7 @@ public class HelloAndroidActivity extends Activity {
 	private static String TAG = "something-sizzle";
 	private WiFiScanReceiver wifiScanReceiver;
 	private WifiManager wifiManager;
-    private ListView listView1;
+	private ListView listView1;
 
 	/**
 	 * Called when the activity is first created.
@@ -35,10 +35,10 @@ public class HelloAndroidActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, "onCreate");
 		setContentView(R.layout.main);
+		listView1 = (ListView) findViewById(R.id.listView1);
 		registerReceiver(getWifiScanReceiver(), new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-		
+
 		this.getWifiManager().startScan();
-	       listView1 = (ListView)findViewById(R.id.listView1);
 
 	}
 
