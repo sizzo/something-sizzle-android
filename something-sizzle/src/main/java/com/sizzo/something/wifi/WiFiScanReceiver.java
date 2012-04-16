@@ -15,20 +15,18 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.sizzo.something.HelloAndroidActivity;
-
 public class WiFiScanReceiver extends BroadcastReceiver {
 	private static final String TAG = "WiFiScanReceiver";
-	private HelloAndroidActivity helloAndroidActivity;
+	private ListView listView;
 
-	public WiFiScanReceiver(HelloAndroidActivity activity) {
+	public WiFiScanReceiver(final ListView listView) {
 		super();
-		this.helloAndroidActivity = activity;
-		 helloAndroidActivity.getWifiListView().setOnItemClickListener(new OnItemClickListener() {
+		this.listView = listView;
+		 listView.setOnItemClickListener(new OnItemClickListener() {
     		@Override
     		public void onItemClick(AdapterView<?> parent, View view,
     			int position, long id) {
-    			Toast.makeText(helloAndroidActivity.getApplicationContext(),
+    			Toast.makeText(listView.getContext(),
     				"Will popup dialog to ask the user connect to this wifi. Click ListItem Number " + position, Toast.LENGTH_LONG)
     				.show();
     		}
@@ -37,7 +35,7 @@ public class WiFiScanReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context c, Intent intent) {
-		List<ScanResult> wifiList = helloAndroidActivity.getWifiManager().getScanResults();
+		List<ScanResult> wifiList = ((WifiManager) c.getSystemService(Context.WIFI_SERVICE)).getScanResults();
 		ScanResult bestSignal = null;
 		for (ScanResult result : wifiList) {
 			if (bestSignal == null || WifiManager.compareSignalLevel(bestSignal.level, result.level) < 0)
@@ -47,7 +45,7 @@ public class WiFiScanReceiver extends BroadcastReceiver {
 		String message = String.format("%s networks found. %s is the strongest.", wifiList.size(), bestSignal.SSID);
 		Toast.makeText(c, message, Toast.LENGTH_LONG).show();
 
-		helloAndroidActivity.getWifiListView().setAdapter(new ArrayAdapter<ScanResult>(c, android.R.layout.test_list_item , wifiList));
+		listView.setAdapter(new ArrayAdapter<ScanResult>(c, android.R.layout.test_list_item , wifiList));
 
 		Log.d(TAG, "onReceive() message: " + message);
 	}
