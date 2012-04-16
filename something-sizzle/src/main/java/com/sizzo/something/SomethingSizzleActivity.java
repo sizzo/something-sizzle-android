@@ -35,7 +35,9 @@ public class SomethingSizzleActivity extends Activity {
 		webview.setWebViewClient(new HelloWebViewClient());
 		webview.getSettings().setJavaScriptEnabled(true);
 		webview.getSettings().setBlockNetworkImage(true);
-		webview.loadUrl("http://m.google.cn");
+		webview.getSettings().setBuiltInZoomControls(true);
+		webview.loadUrl("file:///android_asset/html/home.html");
+//		webview.loadUrl("http://m.google.cn");
 	}
 
 	@Override
