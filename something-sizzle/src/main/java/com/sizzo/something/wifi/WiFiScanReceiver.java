@@ -2,6 +2,7 @@ package com.sizzo.something.wifi;
 
 import java.util.List;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,22 +16,28 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.sizzo.something.BrowseActivity;
+
 public class WiFiScanReceiver extends BroadcastReceiver {
 	private static final String TAG = "WiFiScanReceiver";
 	private ListView listView;
+	private Activity parentActivity;
 
-	public WiFiScanReceiver(final ListView listView) {
+	public WiFiScanReceiver(Activity parentActivity,final ListView listView) {
 		super();
+		this.parentActivity = parentActivity;
 		this.listView = listView;
-		 listView.setOnItemClickListener(new OnItemClickListener() {
-    		@Override
-    		public void onItemClick(AdapterView<?> parent, View view,
-    			int position, long id) {
-    			Toast.makeText(listView.getContext(),
-    				"Will popup dialog to ask the user connect to this wifi. Click ListItem Number " + position, Toast.LENGTH_LONG)
-    				.show();
-    		}
-    	});
+		listView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				launchBrowser();
+			}
+		});
+	}
+
+	protected void launchBrowser() {
+		Intent i = new Intent(parentActivity, BrowseActivity.class);
+		parentActivity.startActivity(i);
 	}
 
 	@Override
@@ -43,10 +50,9 @@ public class WiFiScanReceiver extends BroadcastReceiver {
 		}
 
 		String message = String.format("%s networks found. %s is the strongest.", wifiList.size(), bestSignal.SSID);
-		Toast.makeText(c, message, Toast.LENGTH_LONG).show();
+		// Toast.makeText(c, message, Toast.LENGTH_LONG).show();
 
-		listView.setAdapter(new ArrayAdapter<ScanResult>(c, android.R.layout.test_list_item , wifiList));
-
+		listView.setAdapter(new ArrayAdapter<ScanResult>(c, android.R.layout.test_list_item, wifiList));
 		Log.d(TAG, "onReceive() message: " + message);
 	}
 
