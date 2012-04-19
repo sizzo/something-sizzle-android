@@ -3,31 +3,34 @@
 
     <item
         android:id="@+id/dynamicUserHome"
-        android:showAsAction="ifRoom"
+        android:showAsAction="always"
         android:title="@string/dynamicUserHomeOption">
     </item>
     <item
         android:id="@+id/wifis"
-        android:showAsAction="ifRoom"
-        android:title="@string/wifisOption">
-    </item>
-    <item
-        android:id="@+id/history"
         android:showAsAction="always"
-        android:title="@string/historyOption">
+        android:title="@string/wifisOption">
     </item>
     <item
         android:showAsAction="ifRoom"
         android:title="Tools...">
         <menu>
-            <item android:title="Barcode">
+            <item
+                android:id="@+id/history"
+                android:showAsAction="ifRoom"
+                android:title="@string/historyOption">
             </item>
-            <item android:title="Theme">
+            <item
+                android:id="@+id/barcode"
+                android:showAsAction="ifRoom"
+                android:title="Barcode">
             </item>
-            <item android:title="Settings">
+            <item
+                android:id="@+id/settings"
+                android:showAsAction="ifRoom"
+                android:title="Settings">
             </item>
         </menu>
     </item>
-    
 
 </menu>

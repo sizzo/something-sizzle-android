@@ -8,15 +8,16 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ListView;
 
+import com.sizzo.something.menu.OptionsMenu;
 import com.sizzo.something.wifi.WiFiScanReceiver;
 
 public class MainActivity extends Activity {
 
 	private static String TAG = "something-sizzle";
+	OptionsMenu optionsMenu;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -30,25 +31,27 @@ public class MainActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.main_menu, menu);
-		return true;
+		optionsMenu = new OptionsMenu(this,menu);
+		return optionsMenu.createOptionsMenu();
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.dynamicUserHome) {
-			launchBrowser();
-		} else if (item.getItemId() == R.id.wifis) {
-			((WifiManager) getSystemService(Context.WIFI_SERVICE)).startScan();
-		} else if (item.getItemId() == R.id.history) {
-		}
-		Log.i(TAG, "Selected Menu Item=[" + item.getTitle() + "]");
-		return false;
+		return optionsMenu.optionsItemSelected(item);
 	}
 
-	protected void launchBrowser() {
-		Intent i = new Intent(this, BrowseActivity.class);
-		this.startActivity(i);
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onRestoreInstanceState(savedInstanceState);
 	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		// TODO Auto-generated method stub
+		super.onSaveInstanceState(outState);
+	}
+	
+	
+	
 }
