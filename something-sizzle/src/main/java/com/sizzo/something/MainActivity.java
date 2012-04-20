@@ -1,12 +1,11 @@
 package com.sizzo.something;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
@@ -18,12 +17,14 @@ public class MainActivity extends Activity {
 
 	private static String TAG = "something-sizzle";
 	OptionsMenu optionsMenu;
+	private BroadcastReceiver wiFiScanReceiver;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		registerReceiver(new WiFiScanReceiver(this, (ListView) findViewById(R.id.wifiListView)), new IntentFilter(
+		wiFiScanReceiver = new WiFiScanReceiver(this, (ListView) findViewById(R.id.wifiListView));
+		registerReceiver(wiFiScanReceiver , new IntentFilter(
 				WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
 
 		((WifiManager) getSystemService(Context.WIFI_SERVICE)).startScan();
@@ -31,8 +32,24 @@ public class MainActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		optionsMenu = new OptionsMenu(this,menu);
+		optionsMenu = new OptionsMenu(this, menu);
 		return optionsMenu.createOptionsMenu();
+	}
+
+	
+	@Override
+	protected void onPause() {
+		unregisterReceiver(wiFiScanReceiver);
+		wiFiScanReceiver = null;
+		super.onPause();
+	}
+
+	@Override
+	protected void onRestart() {
+		wiFiScanReceiver = new WiFiScanReceiver(this, (ListView) findViewById(R.id.wifiListView));
+		registerReceiver(wiFiScanReceiver , new IntentFilter(
+				WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+		super.onRestart();
 	}
 
 	@Override
@@ -42,16 +59,12 @@ public class MainActivity extends Activity {
 
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onRestoreInstanceState(savedInstanceState);
 	}
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		// TODO Auto-generated method stub
 		super.onSaveInstanceState(outState);
 	}
-	
-	
-	
+
 }
