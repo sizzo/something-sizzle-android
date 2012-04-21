@@ -7,8 +7,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.sizzo.something.BrowseActivity;
-import com.sizzo.something.MainActivity;
+import com.sizzo.something.BrowserActivity;
+import com.sizzo.something.WifiActivity;
 import com.sizzo.something.R;
 
 public class OptionsMenu {
@@ -25,23 +25,18 @@ public class OptionsMenu {
 		MenuInflater inflater = activity.getMenuInflater();
 		inflater.inflate(R.menu.main_menu, menu);
 		return true;
-
 	}
 
 	public boolean optionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.dynamicUserHome) {
-			Intent i = new Intent(activity, BrowseActivity.class);
+			Intent i = new Intent(activity, BrowserActivity.class);
 			activity.startActivity(i);
-			// launchBrowser();
 		} else if (item.getItemId() == R.id.wifis) {
-			Intent i = new Intent(activity, MainActivity.class);
+			Intent i = new Intent(activity, WifiActivity.class);
 			activity.startActivity(i);
-			// ((WifiManager)
-			// getSystemService(Context.WIFI_SERVICE)).startScan();
 		} else if (item.getItemId() == R.id.history) {
 		}
 		Log.i(TAG, "Selected Menu Item=[" + item.getTitle() + "]");
 		return false;
 	}
-
 }

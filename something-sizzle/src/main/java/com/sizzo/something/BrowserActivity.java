@@ -11,7 +11,7 @@ import android.webkit.WebViewClient;
 import com.sizzo.something.menu.OptionsMenu;
 import com.sizzo.something.util.DataHelper;
 
-public class BrowseActivity extends Activity {
+public class BrowserActivity extends Activity {
 
 	private static String TAG = "something-browse";
 	private WebView webview;
@@ -65,8 +65,14 @@ public class BrowseActivity extends Activity {
 		webview.getSettings().setJavaScriptEnabled(true);
 		webview.getSettings().setBlockNetworkImage(true);
 		webview.getSettings().setBuiltInZoomControls(true);
-		webview.loadUrl("file:///android_asset/html/home.html");
-		// webview.loadUrl("http://m.google.cn");
+		Bundle extras = getIntent().getExtras();
+		if (extras != null) {
+			String url = extras.getString("url");
+			webview.loadUrl(url);
+			// webview.loadUrl("http://m.google.cn");
+		} else {
+			webview.loadUrl("file:///android_asset/html/home.html");
+		}
 	}
 
 	@Override
