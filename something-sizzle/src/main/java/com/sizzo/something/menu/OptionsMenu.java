@@ -30,11 +30,17 @@ public class OptionsMenu {
 	public boolean optionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.dynamicUserHome) {
 			Intent i = new Intent(activity, BrowserActivity.class);
+			i.putExtra("url", "http://wap.sohu.com" );
 			activity.startActivity(i);
 		} else if (item.getItemId() == R.id.wifis) {
 			Intent i = new Intent(activity, WifiActivity.class);
 			activity.startActivity(i);
 		} else if (item.getItemId() == R.id.history) {
+		} else if (item.getItemId() == R.id.barcode) {
+		} else if (item.getItemId() == R.id.settings) {
+			Intent i = new Intent(activity, BrowserActivity.class);
+			i.putExtra("url", "file:///android_asset/html/setting.html" );
+			activity.startActivity(i);
 		}
 		Log.i(TAG, "Selected Menu Item=[" + item.getTitle() + "]");
 		return false;

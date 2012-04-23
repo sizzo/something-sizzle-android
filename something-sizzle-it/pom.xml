@@ -14,7 +14,7 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>apk</packaging>
   <name>something-sizzle-it - Integration tests</name>
-
+ 
   <properties>
       <!--
         When not running a release, we are deploying the plain artifact (so no classifier)

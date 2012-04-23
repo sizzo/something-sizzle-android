@@ -5,8 +5,11 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import com.sizzo.something.menu.OptionsMenu;
 import com.sizzo.something.util.DataHelper;
@@ -19,6 +22,7 @@ public class BrowserActivity extends Activity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		getWindow().requestFeature(Window.FEATURE_PROGRESS);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.browser);
 
@@ -55,6 +59,15 @@ public class BrowserActivity extends Activity {
 
 	private void initWebView() {
 		webview = (WebView) findViewById(R.id.webview);
+
+		webview.getSettings().setJavaScriptEnabled(true);
+		final Activity activity = this;
+		webview.setWebChromeClient(new WebChromeClient() {
+			public void onProgressChanged(WebView view, int progress) {
+				activity.setProgress(progress * 1000);
+			}
+		});
+
 		webview.setWebViewClient(new WebViewClient() {
 			@Override
 			public boolean shouldOverrideUrlLoading(WebView view, String url) {

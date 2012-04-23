@@ -13,6 +13,14 @@
   <packaging>apk</packaging>
   <name>something-sizzle - Application</name>
 
+  <repositories>
+      <repository>
+          <id>releases</id>
+          <name>Releases</name>
+          <url>https://oss.sonatype.org/content/repositories/releases</url>
+      </repository>
+  </repositories>
+  
   <dependencies>
     <dependency>
       <groupId>com.google.android</groupId>
@@ -22,6 +30,11 @@
       <groupId>de.akquinet.android.androlog</groupId>
       <artifactId>androlog</artifactId>
     </dependency>
+    <dependency>
+        <groupId>javax.jmdns</groupId>
+        <artifactId>jmdns</artifactId>
+        <version>3.4.1</version>
+      </dependency>
   </dependencies>
 
   <build>
@@ -31,9 +44,19 @@
         <artifactId>android-maven-plugin</artifactId>
         <extensions>true</extensions>
       </plugin>
-    </plugins>
+	    <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-eclipse-plugin</artifactId>
+	        <configuration>
+	            <downloadSources>true</downloadSources>
+	            <downloadJavadocs>true</downloadJavadocs>
+	        </configuration>
+	    </plugin>
+      </plugins>
   </build>
 
+      
+  
   <profiles>
     <profile>
       <id>release</id>
