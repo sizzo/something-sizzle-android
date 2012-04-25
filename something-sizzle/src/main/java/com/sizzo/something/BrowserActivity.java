@@ -11,8 +11,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import com.sizzo.something.dao.SettingDao;
 import com.sizzo.something.menu.OptionsMenu;
-import com.sizzo.something.util.DataHelper;
 
 public class BrowserActivity extends Activity {
 
@@ -33,7 +33,7 @@ public class BrowserActivity extends Activity {
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		// String lastUrl = savedInstanceState.getString("lastUrl");
 
-		DataHelper dh = new DataHelper(getBaseContext());
+		SettingDao dh = new SettingDao(getBaseContext());
 		String title = (String) dh.getCode("browser.title", "Rainbow");
 		String lastUrl = (String) dh.getCode("lastUrl", "file:///android_asset/html/home.html");
 		dh.close();
@@ -47,7 +47,7 @@ public class BrowserActivity extends Activity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 
-		DataHelper dh = new DataHelper(getBaseContext());
+		SettingDao dh = new SettingDao(getBaseContext());
 		dh.setCode("browser.title", this.getTitle(), "string");
 		dh.setCode("lastUrl", webview.getUrl(), "string");
 		dh.close();

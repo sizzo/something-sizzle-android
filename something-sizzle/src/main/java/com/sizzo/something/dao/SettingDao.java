@@ -1,11 +1,11 @@
-package com.sizzo.something.util;
+package com.sizzo.something.dao;
 import java.util.Date;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class DataHelper {
+public class SettingDao {
 
     private static final String DATABASE_NAME = "autoMate.db";
     private static final int DATABASE_VERSION = 1;
@@ -14,7 +14,7 @@ public class DataHelper {
     private SQLiteDatabase db;
     private OpenHelper oh ;
 
-    public DataHelper(Context context) {
+    public SettingDao(Context context) {
         this.context = context;
         this.oh = new OpenHelper(this.context);
         this.db = oh.getWritableDatabase();
