@@ -3,8 +3,18 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-
-
+
+    <TextView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/wifiCurrentView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="#fff"
+        android:dividerHeight="1sp"
+        android:text="@string/wifi_current_information"
+        android:textSize="32px" >
+		
+    </TextView>
 
     <ListView
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -16,7 +26,7 @@
         android:divider="#fff"
         android:dividerHeight="0sp"
         android:overScrollFooter="@null" >
-﻿
+﻿
     </ListView>
-    
+
 </LinearLayout>

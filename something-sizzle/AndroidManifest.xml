@@ -16,7 +16,9 @@
     </uses-permission>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" >
+    </uses-permission>
 
     <application
         android:icon="@drawable/icon"
@@ -27,9 +29,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".BrowserActivity" android:label="@string/browserTitle">
+        <activity
+            android:name=".BrowserActivity"
+            android:label="@string/browserTitle" >
         </activity>
-        
+
         <receiver android:name=".service.ScheduleReceiver" >
             <intent-filter>
                 <action android:name="android.net.wifi.SCAN_RESULTS" />
@@ -39,6 +43,12 @@
         </receiver>
         <service android:name=".service.jmdns.DiscoverService" >
         </service>
+
+        <provider
+            android:name=".data.SizzoContentProvider"
+            android:authorities="com.sizzo.something.data"
+            android:multiprocess="true" >
+        </provider>
     </application>
 
 </manifest>
