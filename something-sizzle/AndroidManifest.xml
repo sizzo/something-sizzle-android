@@ -45,8 +45,8 @@
         </service>
 
         <provider
-            android:name=".data.SizzoContentProvider"
-            android:authorities="com.sizzo.something.data"
+            android:name=".data.SizzoProvider"
+            android:authorities="com.sizzo.data"
             android:multiprocess="true" >
         </provider>
     </application>

@@ -22,10 +22,15 @@
   </repositories>
   
   <dependencies>
-    <dependency>
-      <groupId>com.google.android</groupId>
-      <artifactId>android</artifactId>
-    </dependency>
+	<dependency>
+		<groupId>com.google.android</groupId>
+		<artifactId>android</artifactId>
+	</dependency>    
+	<dependency>
+		<groupId>com.google.collections</groupId>
+		<artifactId>google-collections</artifactId>
+		<version>1.0</version>
+	</dependency>
     <dependency>
       <groupId>de.akquinet.android.androlog</groupId>
       <artifactId>androlog</artifactId>

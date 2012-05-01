@@ -27,8 +27,10 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-import com.sizzo.something.data.SizzoContentProvider;
-import com.sizzo.something.data.SizzoSchema;
+import com.sizzo.something.data.Contents;
+import com.sizzo.something.data.SizzoDatabaseHelper;
+import com.sizzo.something.data.SizzoProvider;
+import com.sizzo.something.data.SizzoUriMatcher;
 import com.sizzo.something.menu.OptionsMenu;
 
 public class WifiActivity extends Activity {
@@ -142,10 +144,10 @@ public class WifiActivity extends Activity {
 						+ currentWifiConnection.getSupplicantState());
 
 				ContentValues editedValues = new ContentValues();
-				editedValues.put(SizzoSchema.Content.UID.name(), currentWifiConnection.getBSSID());
-				editedValues.put(SizzoSchema.Content.TITLE.name(), currentWifiConnection.getSSID());
-				editedValues.put(SizzoSchema.Content.DETAIL.name(), currentWifiConnection.toString());
-				getContentResolver().update(ContentUris.withAppendedId(SizzoContentProvider.WIFIS_URI, 2), editedValues,
+				editedValues.put(Contents.UID, currentWifiConnection.getBSSID());
+				editedValues.put(Contents.TITLE, currentWifiConnection.getSSID());
+				editedValues.put(Contents.DETAIL, currentWifiConnection.toString());
+				getContentResolver().update(ContentUris.withAppendedId(SizzoUriMatcher.WIFIS_URI, 2), editedValues,
 						null, null);
 			} else {
 				wifiCurrentView.setText("You are not connecting to any WIFI");
@@ -161,21 +163,21 @@ public class WifiActivity extends Activity {
 			for (ScanResult result : wifiList) {
 				ContentValues values = new ContentValues();
 				
-				values.put(SizzoSchema.Content.UID.name(), result.BSSID);
-				values.put(SizzoSchema.Content.TITLE.name(), result.SSID);
-				values.put(SizzoSchema.Content.DETAIL.name(), result.toString());
-				Uri uri = getContentResolver().insert(SizzoContentProvider.WIFIS_URI, values);
+				values.put(Contents.UID, result.BSSID);
+				values.put(Contents.TITLE, result.SSID);
+				values.put(Contents.DETAIL, result.toString());
+				Uri uri = getContentResolver().insert(SizzoUriMatcher.WIFIS_URI, values);
 				values.clear();
 			}
 
 
-			Cursor cursor = managedQuery(SizzoContentProvider.WIFIS_URI, null, null, null, SizzoSchema.Content.TITLE.name()+" desc");
+			Cursor cursor = managedQuery(SizzoUriMatcher.WIFIS_URI, null, null, null, SizzoDatabaseHelper.ContentsColumns.TITLE+" desc");
 			if (cursor.moveToFirst()) {
 				do {
 					Map<String, Object> map = new HashMap<String, Object>();
 					map.put("PIC", R.drawable.pic);
-					map.put("TITLE", cursor.getString(cursor.getColumnIndex(SizzoSchema.Content.TITLE.name())));
-					map.put("DETAIL", cursor.getString(cursor.getColumnIndex(SizzoSchema.Content.DETAIL.name())));
+					map.put("TITLE", cursor.getString(cursor.getColumnIndex(SizzoDatabaseHelper.ContentsColumns.TITLE)));
+					map.put("DETAIL", cursor.getString(cursor.getColumnIndex(SizzoDatabaseHelper.ContentsColumns.DETAIL)));
 					wifiConfigurationAdapts.add(map);
 				} while (cursor.moveToNext());
 			}
@@ -185,7 +187,7 @@ public class WifiActivity extends Activity {
 
 			listView.setAdapter(adapter);
 
-			getContentResolver().delete(ContentUris.withAppendedId(SizzoContentProvider.WIFIS_URI, 2), null, null);
+			getContentResolver().delete(ContentUris.withAppendedId(SizzoUriMatcher.WIFIS_URI, 2), null, null);
 
 		}
 
