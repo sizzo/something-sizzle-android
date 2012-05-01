@@ -8,6 +8,7 @@ public class SizzoSchema {
 		public static final String UID = "UID";
 		public static final String CRATEDDATE = "CRATEDDATE";
 		public static final String LASTUPDATEDDATE = "LASTUPDATEDDATE";
+		public static final String RANK="RANK";
 	}
 
 	public static class Contents {
@@ -17,6 +18,9 @@ public class SizzoSchema {
 			public static final String TITLE = "TITLE";
 			public static final String DETAIL = "DETAIL";
 			public static final String TYPE = "TYPE";
+		}
+		public enum Types{
+			WIFI
 		}
 	}
 

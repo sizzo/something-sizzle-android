@@ -18,7 +18,6 @@ package com.sizzo.something.data;
 
 import java.util.HashMap;
 
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -34,11 +33,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.net.Uri;
 import android.os.Binder;
-import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.GroupMembership;
-import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Groups;
 import android.provider.ContactsContract.RawContacts;
 import android.text.TextUtils;
@@ -71,7 +68,7 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 
 	private static final String DATABASE_NAME = "sizzo.db";
 	private static final String DATABASE_PRESENCE = "presence_db";
-	private SQLiteStatement mWifiNodeInsert;
+	private SQLiteStatement mStatementUpdateWifiNode;
 
 	public interface Tables {
 		// public static final String CONTENTS = "contents";
@@ -179,12 +176,6 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 		final String OUTER_RAW_CONTACTS = "outer_raw_contacts";
 		final String OUTER_RAW_CONTACTS_ID = OUTER_RAW_CONTACTS + "." + RawContacts._ID;
 
-		final String GROUP_HAS_ACCOUNT_AND_SOURCE_ID = Groups.SOURCE_ID + "=? AND " + Groups.ACCOUNT_NAME + "=? AND "
-				+ Groups.ACCOUNT_TYPE + "=? AND " + Groups.DATA_SET + " IS NULL";
-
-		final String GROUP_HAS_ACCOUNT_AND_DATA_SET_AND_SOURCE_ID = Groups.SOURCE_ID + "=? AND " + Groups.ACCOUNT_NAME
-				+ "=? AND " + Groups.ACCOUNT_TYPE + "=? AND " + Groups.DATA_SET + "=?";
-
 	}
 
 	public interface PropertiesColumns {
@@ -195,7 +186,7 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 	/** In-memory cache of previously found MIME-type mappings */
 	private final HashMap<String, Long> mMimetypeCache = new HashMap<String, Long>();
 	/** In-memory cache of previously found package name mappings */
-	private final HashMap<String, Long> mPackageCache = new HashMap<String, Long>();
+	private final HashMap<String, Long> mContentCache = new HashMap<String, Long>();
 
 	/** Compiled statements for querying and inserting mappings */
 	private SQLiteStatement mContactIdQuery;
@@ -205,6 +196,10 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 	private StringBuilder mSb = new StringBuilder();
 
 	private boolean mReopenDatabase = false;
+
+	private SQLiteStatement mStatementContentQueryByUid;
+
+	private SQLiteStatement mStatementContentInitInsert;
 
 	private static SizzoDatabaseHelper sSingleton = null;
 
@@ -240,7 +235,7 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 
 	private void populateMimeTypeCache(SQLiteDatabase db) {
 		mMimetypeCache.clear();
-		mPackageCache.clear();
+		mContentCache.clear();
 
 	}
 
@@ -259,7 +254,9 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 		db.execSQL("CREATE TABLE " + SizzoSchema.Contents.TABLE + " (" + BaseColumns._ID
 				+ " INTEGER PRIMARY KEY AUTOINCREMENT," + SizzoSchema.Contents.Columns.UID + " TEXT,"
 				+ SizzoSchema.Contents.Columns.TITLE + " TEXT," + SizzoSchema.Contents.Columns.DETAIL + " TEXT,"
-				+ SizzoSchema.Contents.Columns.TYPE + " TEXT," + SizzoSchema.Contents.Columns.CRATEDDATE + " TEXT,"
+				+ SizzoSchema.Contents.Columns.TYPE + " TEXT," 
+				+ SizzoSchema.Contents.Columns.RANK + " INTEGER," 
+				+ SizzoSchema.Contents.Columns.CRATEDDATE + " TEXT,"
 				+ SizzoSchema.Contents.Columns.LASTUPDATEDDATE + " TEXT );");
 
 		db.execSQL("CREATE INDEX content_has_uid_index ON " + SizzoSchema.Contents.TABLE + " ("
@@ -479,6 +476,51 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
+	public int delete(int matchNode, String selection, String[] selectionArgs) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public void upsertContentWifiNode(ContentValues values, String selection, String[] selectionArgs) {
+		long rowID = getContentId(values.getAsString(SizzoSchema.Contents.Columns.UID));
+		if (rowID > 0) {
+			if (mStatementUpdateWifiNode == null) {
+				mStatementUpdateWifiNode = getWritableDatabase().compileStatement(
+						"UPDATE " + SizzoSchema.Contents.TABLE + " SET " + SizzoSchema.Contents.Columns.TITLE + "=?, "
+								+ SizzoSchema.Contents.Columns.DETAIL + "=?, " + SizzoSchema.Contents.Columns.TYPE
+								+ "=?, " + SizzoSchema.Contents.Columns.LASTUPDATEDDATE + "=date('now')" + " WHERE "
+								+ SizzoSchema.Contents.Columns.UID + "=?");
+			}
+			bindString(mStatementUpdateWifiNode, 1, values.getAsString(SizzoSchema.Contents.Columns.TITLE));
+			bindString(mStatementUpdateWifiNode, 2, values.getAsString(SizzoSchema.Contents.Columns.DETAIL));
+			bindString(mStatementUpdateWifiNode, 3, SizzoSchema.Contents.Types.WIFI.name());
+			bindString(mStatementUpdateWifiNode, 4, values.getAsString(SizzoSchema.Contents.Columns.UID));
+			mStatementUpdateWifiNode.execute();
+		}
+	}
+
+	public long getContentId(String uid) {
+		if (uid == null || uid.trim().length() == 0) {
+			return -1;
+		}
+		// Try an in-memory cache lookup
+		if (mContentCache.containsKey(uid)) {
+			return mContentCache.get(uid);
+		}
+		if (mStatementContentQueryByUid == null) {
+			mStatementContentQueryByUid = getWritableDatabase().compileStatement(
+					"SELECT " + SizzoSchema.Contents.Columns._ID + " FROM " + SizzoSchema.Contents.TABLE + " WHERE "
+							+ SizzoSchema.Contents.Columns.UID + "=?");
+		}
+
+		if (mStatementContentInitInsert == null) {
+			mStatementContentInitInsert = getWritableDatabase().compileStatement(
+					"INSERT INTO " + SizzoSchema.Contents.TABLE + "(" + SizzoSchema.Contents.Columns.UID + ","
+							+ SizzoSchema.Contents.Columns.CRATEDDATE + ") VALUES (?,date('now'))");
+		}
+		return lookupAndCacheId(mStatementContentQueryByUid, mStatementContentInitInsert, uid, mContentCache);
+	}
+
 	/**
 	 * Perform an internal string-to-integer lookup using the compiled
 	 * {@link SQLiteStatement} provided. If a mapping isn't found in database,
@@ -542,27 +584,6 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 			}
 			toValues.put(toKey, longValue);
 		}
-	}
-
-	/**
-	 * Delete the aggregate contact if it has no constituent raw contacts other
-	 * than the supplied one.
-	 */
-	public void removeContactIfSingleton(long rawContactId) {
-		SQLiteDatabase db = getWritableDatabase();
-
-		// Obtain contact ID from the supplied raw contact ID
-		String contactIdFromRawContactId = "(SELECT " + RawContacts.CONTACT_ID + " FROM " + Tables.PROPERTIES
-				+ " WHERE " + RawContacts._ID + "=" + rawContactId + ")";
-
-		// Find other raw contacts in the same aggregate contact
-		String otherRawContacts = "(SELECT contacts1." + RawContacts._ID + " FROM " + Tables.PROPERTIES
-				+ " contacts1 JOIN " + Tables.PROPERTIES + " contacts2 ON (" + "contacts1." + RawContacts.CONTACT_ID
-				+ "=contacts2." + RawContacts.CONTACT_ID + ") WHERE contacts1." + RawContacts._ID + "!=" + rawContactId
-				+ "" + " AND contacts2." + RawContacts._ID + "=" + rawContactId + ")";
-
-		db.execSQL("DELETE FROM " + SizzoSchema.Contents.TABLE + " WHERE " + Contacts._ID + "="
-				+ contactIdFromRawContactId + " AND NOT EXISTS " + otherRawContacts + ";");
 	}
 
 	/**
@@ -674,45 +695,4 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 		return sb.toString();
 	}
 
-
-	public int delete(int matchNode, String selection, String[] selectionArgs) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public long insert(int matchNode, ContentValues values) {
-		long rowID = -1;
-		switch (matchNode) {
-		case SizzoUriMatcher.WIFIS:
-			rowID = insertWifiNode(values);
-			break;
-		default:
-			//unknown matchNode;
-		}
-
-		return rowID;
-	}
-
-	private long insertWifiNode(ContentValues values) {
-		long rowID;
-		if (mWifiNodeInsert == null) {
-			mWifiNodeInsert = getWritableDatabase().compileStatement(
-					"INSERT OR IGNORE INTO " + SizzoSchema.Contents.TABLE + "(" + SizzoSchema.Contents.Columns.UID
-							+ "," + SizzoSchema.Contents.Columns.TITLE + "," + SizzoSchema.Contents.Columns.DETAIL
-							+ "," + SizzoSchema.Contents.Columns.TYPE + "," + SizzoSchema.Contents.Columns.CRATEDDATE
-							+ "," + SizzoSchema.Contents.Columns.LASTUPDATEDDATE
-							+ ") VALUES (?,?,?,?,date('now'),date('now'))");
-		}
-		bindString(mWifiNodeInsert, 1, values.getAsString(SizzoSchema.Contents.Columns.UID));
-		bindString(mWifiNodeInsert, 2, values.getAsString(SizzoSchema.Contents.Columns.TITLE));
-		bindString(mWifiNodeInsert, 3, values.getAsString(SizzoSchema.Contents.Columns.DETAIL));
-		bindString(mWifiNodeInsert, 4, "WIFI");
-		rowID = mWifiNodeInsert.executeInsert();
-		return rowID;
-	}
-
-	public int update(int matchNode, ContentValues values, String selection, String[] selectionArgs) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 }

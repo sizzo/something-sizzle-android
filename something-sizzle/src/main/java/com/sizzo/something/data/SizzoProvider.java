@@ -17,10 +17,6 @@ public class SizzoProvider extends AbstractSizzoProvider {
 	private static final String TAG = "SizzoProvider";
 
 	private static final SizzoUriMatcher uriMatcher = SizzoUriMatcher.getInstance();
-	// ---for database use---
-	// private SQLiteDatabase sizzoDB;
-	// private final ThreadLocal<SizzoDatabaseHelper> mDbHelper =
-	// new ThreadLocal<SizzoDatabaseHelper>();
 	private SizzoDatabaseHelper mSizzoDBHelper;
 
 	@Override
@@ -89,7 +85,8 @@ public class SizzoProvider extends AbstractSizzoProvider {
 		int matchNode = uriMatcher.match(uri);
 		switch (matchNode) {
 		case SizzoUriMatcher.WIFIS:
-			long rowID = mSizzoDBHelper.insert(matchNode, values);
+			mSizzoDBHelper.upsertContentWifiNode(values, null, null);
+			long rowID = mSizzoDBHelper.getContentId(values.getAsString(SizzoSchema.Contents.Columns.UID));
 			if (rowID > 0) {
 				Uri nodeUri = ContentUris.withAppendedId(SizzoUriMatcher.WIFIS_URI, rowID);
 				getContext().getContentResolver().notifyChange(uri, null);
@@ -111,7 +108,8 @@ public class SizzoProvider extends AbstractSizzoProvider {
 			sqlBuilder.appendWhere(SizzoSchema.Contents.Columns._ID + "=" + uri.getPathSegments().get(1));
 		if (sortOrder == null || sortOrder == "")
 			sortOrder = SizzoSchema.Contents.Columns.TITLE;
-		Cursor c = sqlBuilder.query(mSizzoDBHelper.getReadableDatabase(), projection, selection, selectionArgs, null, null, sortOrder);
+		Cursor c = sqlBuilder.query(mSizzoDBHelper.getReadableDatabase(), projection, selection, selectionArgs, null,
+				null, sortOrder);
 		// ---register to watch a content URI for changes---
 		c.setNotificationUri(getContext().getContentResolver(), uri);
 		return c;
@@ -121,19 +119,17 @@ public class SizzoProvider extends AbstractSizzoProvider {
 	public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
 		int count = 0;
 		int matchNode = uriMatcher.match(uri);
-		
+
 		switch (matchNode) {
 		case SizzoUriMatcher.WIFIS:
-			count = mSizzoDBHelper.update(matchNode, values, selection, selectionArgs);
-			break;
 		case SizzoUriMatcher.WIFIS_ID:
-			count = mSizzoDBHelper.update(matchNode, values, selection,	selectionArgs);
+			mSizzoDBHelper.upsertContentWifiNode(values, selection, selectionArgs);
 			break;
 		default:
 			throw new IllegalArgumentException("Unknown URI " + uri);
 		}
 		getContext().getContentResolver().notifyChange(uri, null);
-		return count;
+		return (int) count;
 	}
 
 	@Override
