@@ -35,7 +35,6 @@ public class SizzoProvider extends AbstractSizzoProvider {
 		} finally {
 			Log.d(TAG, "onCreate finish");
 		}
-
 	}
 
 	private boolean initialize() {
@@ -106,12 +105,12 @@ public class SizzoProvider extends AbstractSizzoProvider {
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 		SQLiteQueryBuilder sqlBuilder = new SQLiteQueryBuilder();
-		sqlBuilder.setTables(SizzoDatabaseHelper.Tables.CONTENTS);
+		sqlBuilder.setTables(SizzoSchema.Contents.TABLE);
 		if (uriMatcher.match(uri) == SizzoUriMatcher.WIFIS_ID)
 			// ---if getting a particular book---
-			sqlBuilder.appendWhere(SizzoDatabaseHelper.ContentsColumns._ID + "=" + uri.getPathSegments().get(1));
+			sqlBuilder.appendWhere(SizzoSchema.Contents.Columns._ID + "=" + uri.getPathSegments().get(1));
 		if (sortOrder == null || sortOrder == "")
-			sortOrder = SizzoDatabaseHelper.ContentsColumns.TITLE;
+			sortOrder = SizzoSchema.Contents.Columns.TITLE;
 		Cursor c = sqlBuilder.query(mSizzoDBHelper.getReadableDatabase(), projection, selection, selectionArgs, null, null, sortOrder);
 		// ---register to watch a content URI for changes---
 		c.setNotificationUri(getContext().getContentResolver(), uri);

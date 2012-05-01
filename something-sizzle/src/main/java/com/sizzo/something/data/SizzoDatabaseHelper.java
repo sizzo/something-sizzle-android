@@ -74,7 +74,7 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 	private SQLiteStatement mWifiNodeInsert;
 
 	public interface Tables {
-		public static final String CONTENTS = "contents";
+		// public static final String CONTENTS = "contents";
 		public static final String CONTENT2CONTENTS = "content2contents";
 		public static final String USERS = "users";
 		public static final String USER2USERS = "user2users";
@@ -83,8 +83,8 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 		public static final String FILES = "files";
 
 		// This list of tables contains auto-incremented sequences.
-		public static final String[] SEQUENCE_TABLES = new String[] { CONTENTS, CONTENT2CONTENTS, USERS, USER2USERS,
-				USER2CONTENTS, PROPERTIES, FILES, };
+		public static final String[] SEQUENCE_TABLES = new String[] { SizzoSchema.Contents.TABLE, CONTENT2CONTENTS,
+				USERS, USER2USERS, USER2CONTENTS, PROPERTIES, FILES, };
 
 		/**
 		 * For {@link ContactsContract.DataUsageFeedback}. The table structure
@@ -187,16 +187,6 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 
 	}
 
-	public interface ContentsColumns {
-		public static final String _ID = Tables.CONTENTS + "." + BaseColumns._ID;
-		public static final String UID = Tables.CONTENTS + "." + Contents.UID;
-		public static final String TITLE = Tables.CONTENTS + "." + Contents.TITLE;
-		public static final String DETAIL = Tables.CONTENTS + "." + Contents.DETAIL;
-		public static final String TYPE = Tables.CONTENTS + "." + Contents.TYPE;
-		public static final String CRATEDDATE = Tables.CONTENTS + "." + Contents.CRATEDDATE;
-		public static final String LASTUPDATEDDATE = Tables.CONTENTS + "." + Contents.LASTUPDATEDDATE;
-	}
-
 	public interface PropertiesColumns {
 		String PROPERTY_KEY = "property_key";
 		String PROPERTY_VALUE = "property_value";
@@ -266,11 +256,14 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		Log.i(TAG, "Bootstrapping database version: " + DATABASE_VERSION);
 
-		db.execSQL("CREATE TABLE " + Tables.CONTENTS + " (" + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-				+ Contents.UID + " TEXT," + Contents.TITLE + " TEXT," + Contents.DETAIL + " TEXT," + Contents.TYPE
-				+ " TEXT," + Contents.CRATEDDATE + " TEXT," + Contents.LASTUPDATEDDATE + " TEXT );");
+		db.execSQL("CREATE TABLE " + SizzoSchema.Contents.TABLE + " (" + BaseColumns._ID
+				+ " INTEGER PRIMARY KEY AUTOINCREMENT," + SizzoSchema.Contents.Columns.UID + " TEXT,"
+				+ SizzoSchema.Contents.Columns.TITLE + " TEXT," + SizzoSchema.Contents.Columns.DETAIL + " TEXT,"
+				+ SizzoSchema.Contents.Columns.TYPE + " TEXT," + SizzoSchema.Contents.Columns.CRATEDDATE + " TEXT,"
+				+ SizzoSchema.Contents.Columns.LASTUPDATEDDATE + " TEXT );");
 
-		db.execSQL("CREATE INDEX content_has_uid_index ON " + Tables.CONTENTS + " (" + Contents.UID + ");");
+		db.execSQL("CREATE INDEX content_has_uid_index ON " + SizzoSchema.Contents.TABLE + " ("
+				+ SizzoSchema.Contents.Columns.UID + ");");
 
 		// When adding new tables, be sure to also add size-estimates in
 		// updateSqliteStats
@@ -304,18 +297,25 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 	}
 
 	private void createGroupsView(SQLiteDatabase db) {
-//		db.execSQL("DROP VIEW IF EXISTS " + Views.GROUPS + ";");
-//		String groupsColumns = Groups.ACCOUNT_NAME + "," + Groups.ACCOUNT_TYPE + "," + Groups.DATA_SET + ","
-//				+ "(CASE WHEN " + Groups.DATA_SET + " IS NULL THEN " + Groups.ACCOUNT_TYPE + " ELSE "
-//				+ Groups.ACCOUNT_TYPE + "||" + Groups.DATA_SET + " END) AS " + Groups.SOURCE_ID + "," + Groups.VERSION
-//				+ "," + Groups.DIRTY + "," + Groups.TITLE + "," + Groups.NOTES + "," + Groups.SYSTEM_ID + ","
-//				+ Groups.DELETED + "," + Groups.GROUP_VISIBLE + "," + Groups.SHOULD_SYNC + "," + Groups.AUTO_ADD + ","
-//				+ Groups.FAVORITES + "," + Groups.GROUP_IS_READ_ONLY + "," + Groups.SYNC1 + "," + Groups.SYNC2 + ","
-//				+ Groups.SYNC3 + "," + Groups.SYNC4 + ",";
-//
-//		String groupsSelect = "SELECT " + groupsColumns + " FROM " + Tables.GROUPS_JOIN_PACKAGES;
-//
-//		db.execSQL("CREATE VIEW " + Views.GROUPS + " AS " + groupsSelect);
+		// db.execSQL("DROP VIEW IF EXISTS " + Views.GROUPS + ";");
+		// String groupsColumns = Groups.ACCOUNT_NAME + "," +
+		// Groups.ACCOUNT_TYPE + "," + Groups.DATA_SET + ","
+		// + "(CASE WHEN " + Groups.DATA_SET + " IS NULL THEN " +
+		// Groups.ACCOUNT_TYPE + " ELSE "
+		// + Groups.ACCOUNT_TYPE + "||" + Groups.DATA_SET + " END) AS " +
+		// Groups.SOURCE_ID + "," + Groups.VERSION
+		// + "," + Groups.DIRTY + "," + Groups.TITLE + "," + Groups.NOTES + ","
+		// + Groups.SYSTEM_ID + ","
+		// + Groups.DELETED + "," + Groups.GROUP_VISIBLE + "," +
+		// Groups.SHOULD_SYNC + "," + Groups.AUTO_ADD + ","
+		// + Groups.FAVORITES + "," + Groups.GROUP_IS_READ_ONLY + "," +
+		// Groups.SYNC1 + "," + Groups.SYNC2 + ","
+		// + Groups.SYNC3 + "," + Groups.SYNC4 + ",";
+		//
+		// String groupsSelect = "SELECT " + groupsColumns + " FROM " +
+		// Tables.GROUPS_JOIN_PACKAGES;
+		//
+		// db.execSQL("CREATE VIEW " + Views.GROUPS + " AS " + groupsSelect);
 	}
 
 	@Override
@@ -323,7 +323,7 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 		if (oldVersion < 99) {
 			Log.i(TAG, "Upgrading from version " + oldVersion + " to " + newVersion + ", data will be lost!");
 
-			db.execSQL("DROP TABLE IF EXISTS " + Tables.CONTENTS + ";");
+			db.execSQL("DROP TABLE IF EXISTS " + SizzoSchema.Contents.TABLE + ";");
 			db.execSQL("DROP TABLE IF EXISTS " + Tables.PROPERTIES + ";");
 			db.execSQL("DROP TABLE IF EXISTS " + Tables.USER2USERS + ";");
 			db.execSQL("DROP TABLE IF EXISTS " + Tables.USER2CONTENTS + ";");
@@ -407,8 +407,8 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 		// which can lead to catastrophic query plans for small tables
 		try {
 			db.execSQL("DELETE FROM sqlite_stat1");
-			updateIndexStats(db, Tables.CONTENTS, "contacts_has_phone_index", "9000 500");
-			updateIndexStats(db, Tables.CONTENTS, "contacts_name_raw_contact_id_index", "9000 1");
+			updateIndexStats(db, SizzoSchema.Contents.TABLE, "contacts_has_phone_index", "9000 500");
+			updateIndexStats(db, SizzoSchema.Contents.TABLE, "contacts_name_raw_contact_id_index", "9000 1");
 
 			updateIndexStats(db, Tables.PROPERTIES, "raw_contacts_source_id_index", "10000 1 1 1");
 			updateIndexStats(db, Tables.PROPERTIES, "raw_contacts_contact_id_index", "10000 2");
@@ -455,7 +455,7 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 	public void wipeData() {
 		SQLiteDatabase db = getWritableDatabase();
 
-		db.execSQL("DELETE FROM " + Tables.CONTENTS + ";");
+		db.execSQL("DELETE FROM " + SizzoSchema.Contents.TABLE + ";");
 		db.execSQL("DELETE FROM " + Tables.PROPERTIES + ";");
 		db.execSQL("DELETE FROM " + Tables.CONTENT2CONTENTS + ";");
 		db.execSQL("DELETE FROM " + Tables.FILES + ";");
@@ -561,8 +561,8 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 				+ "=contacts2." + RawContacts.CONTACT_ID + ") WHERE contacts1." + RawContacts._ID + "!=" + rawContactId
 				+ "" + " AND contacts2." + RawContacts._ID + "=" + rawContactId + ")";
 
-		db.execSQL("DELETE FROM " + Tables.CONTENTS + " WHERE " + Contacts._ID + "=" + contactIdFromRawContactId
-				+ " AND NOT EXISTS " + otherRawContacts + ";");
+		db.execSQL("DELETE FROM " + SizzoSchema.Contents.TABLE + " WHERE " + Contacts._ID + "="
+				+ contactIdFromRawContactId + " AND NOT EXISTS " + otherRawContacts + ";");
 	}
 
 	/**
@@ -674,62 +674,7 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 		return sb.toString();
 	}
 
-	/*
-	 * private static class DatabaseHelper extends SQLiteOpenHelper {
-	 * DatabaseHelper(Context context) { super(context, DATABASE_NAME, null,
-	 * DATABASE_VERSION); }
-	 * 
-	 * @Override public void onCreate(SQLiteDatabase db) { // Content table
-	 * db.execSQL("CREATE TABLE IF  NOT EXISTS " + SizzoSchema.TABLE_CONTENT +
-	 * "(" + SizzoSchema.Content._ID.name() +
-	 * " INTEGER PRIMARY KEY AUTOINCREMENT, " + SizzoSchema.Content.UID.name() +
-	 * " TEXT, " + SizzoSchema.Content.TITLE.name() + " TEXT, " +
-	 * SizzoSchema.Content.DETAIL.name() + " TEXT, type TEXT, " +
-	 * SizzoSchema.Content.CRATEDDATE.name() + " TEXT, " +
-	 * SizzoSchema.Content.LASTUPDATEDDATE.name() + " TEXT)");
-	 * db.execSQL("CREATE TABLE IF  NOT EXISTS  " + SizzoSchema.TABLE_PROPERTY +
-	 * "(" + SizzoSchema.Property._ID.name() +
-	 * " INTEGER PRIMARY KEY AUTOINCREMENT, " + SizzoSchema.Property.NAME.name()
-	 * + " TEXT, " + SizzoSchema.Property.VALUE.name() + " TEXT)"); //
-	 * Content2Content table db.execSQL("CREATE TABLE IF  NOT EXISTS " +
-	 * SizzoSchema.TABLE_CONENT2CONTENT + "(" +
-	 * SizzoSchema.Content2Content._ID.name() +
-	 * " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-	 * SizzoSchema.Content2Content.UIDFROM.name() + " TEXT,  " +
-	 * SizzoSchema.Content2Content.RELATION.name() + " TEXT, " +
-	 * SizzoSchema.Content2Content.UIDTO.name() + " TEXT, " +
-	 * SizzoSchema.Content2Content.DETAIL.name() + " TEXT, " +
-	 * SizzoSchema.Content2Content.CRATEDDATE.name() + " TEXT, " +
-	 * SizzoSchema.Content2Content.LASTUPDATEDDATE.name() + " TEXT)"); // File
-	 * table db.execSQL("CREATE TABLE IF  NOT EXISTS " + SizzoSchema.TABLE_FILE
-	 * + "(" + SizzoSchema.FILE._ID.name() +
-	 * " INTEGER PRIMARY KEY AUTOINCREMENT, " + SizzoSchema.FILE.UID.name() +
-	 * " TEXT, " + SizzoSchema.FILE.NAME.name() + " TEXT, " +
-	 * SizzoSchema.FILE.EXT.name() + " TEXT, " +
-	 * SizzoSchema.FILE.MIMETYPE.name() + " TEXT,  " +
-	 * SizzoSchema.FILE.CONTENT.name() + " BLOB, " +
-	 * SizzoSchema.FILE.CRATEDDATE.name() + " TEXT, " +
-	 * SizzoSchema.FILE.LASTUPDATEDDATE.name() + " TEXT)");
-	 * 
-	 * // User table db.execSQL("CREATE TABLE IF  NOT EXISTS user" +
-	 * "(id INTEGER PRIMARY KEY, uid TEXT, title TEXT, createdDate TEXT, lastUpdatedDate TEXT)"
-	 * ); // User2User table db.execSQL("CREATE TABLE IF  NOT EXISTS user2user"
-	 * +
-	 * "(id INTEGER PRIMARY KEY, uidFrom TEXT,  relation TEXT, uidTo TEXT, detail TEXT, createdDate TEXT, lastUpdatedDate TEXT)"
-	 * ); // User2Content table
-	 * db.execSQL("CREATE TABLE IF  NOT EXISTS user2content" +
-	 * "(id INTEGER PRIMARY KEY, userUid TEXT,  relation TEXT, contentUid TEXT, detail TEXT, createdDate TEXT, lastUpdatedDate TEXT)"
-	 * ); }
-	 * 
-	 * @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int
-	 * newVersion) { Log.w("Content provider database",
-	 * "Upgrading database from version " + oldVersion + " to " + newVersion +
-	 * ", which will destroy all old data"); db.execSQL("DROP TABLE IF EXISTS "
-	 * + SizzoSchema.TABLE_CONTENT); db.execSQL("DROP TABLE IF EXISTS " +
-	 * SizzoSchema.TABLE_PROPERTY); db.execSQL("DROP TABLE IF EXISTS " +
-	 * SizzoSchema.TABLE_CONENT2CONTENT); db.execSQL("DROP TABLE IF EXISTS " +
-	 * SizzoSchema.TABLE_FILE); onCreate(db); } }
-	 */
+
 	public int delete(int matchNode, String selection, String[] selectionArgs) {
 		// TODO Auto-generated method stub
 		return 0;
@@ -737,29 +682,32 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 
 	public long insert(int matchNode, ContentValues values) {
 		long rowID = -1;
-		if (matchNode == SizzoUriMatcher.WIFIS) {
-			if (mWifiNodeInsert == null) {
-				mWifiNodeInsert = getWritableDatabase().compileStatement(
-						"INSERT OR IGNORE INTO " + Tables.CONTENTS + "(" + Contents.UID + "," + Contents.TITLE + ","
-								+ Contents.DETAIL + "," + Contents.TYPE + "," + Contents.CRATEDDATE + ","
-								+ Contents.LASTUPDATEDDATE + ") VALUES (?,?,?,?,date('now'),date('now'))");
-			}
-			bindString(mWifiNodeInsert, 1, values.getAsString(Contents.UID));
-			bindString(mWifiNodeInsert, 2, values.getAsString(Contents.TITLE));
-			bindString(mWifiNodeInsert, 3, values.getAsString(Contents.DETAIL));
-			bindString(mWifiNodeInsert, 4, "WIFI");
-			rowID = mWifiNodeInsert.executeInsert();
-			// }
-			// // ---add a new book---
-			// long rowID = db.insert(Tables.CONTENTS, "", values);
-			// // ---if added successfully---
-			// if (rowID > 0) {
-			// Uri _uri = ContentUris.withAppendedId(WIFIS_URI, rowID);
-			// getContext().getContentResolver().notifyChange(_uri, null);
-			// return _uri;
-			// }
-			// throw new SQLException("Failed to insert row into " + uri);
+		switch (matchNode) {
+		case SizzoUriMatcher.WIFIS:
+			rowID = insertWifiNode(values);
+			break;
+		default:
+			//unknown matchNode;
 		}
+
+		return rowID;
+	}
+
+	private long insertWifiNode(ContentValues values) {
+		long rowID;
+		if (mWifiNodeInsert == null) {
+			mWifiNodeInsert = getWritableDatabase().compileStatement(
+					"INSERT OR IGNORE INTO " + SizzoSchema.Contents.TABLE + "(" + SizzoSchema.Contents.Columns.UID
+							+ "," + SizzoSchema.Contents.Columns.TITLE + "," + SizzoSchema.Contents.Columns.DETAIL
+							+ "," + SizzoSchema.Contents.Columns.TYPE + "," + SizzoSchema.Contents.Columns.CRATEDDATE
+							+ "," + SizzoSchema.Contents.Columns.LASTUPDATEDDATE
+							+ ") VALUES (?,?,?,?,date('now'),date('now'))");
+		}
+		bindString(mWifiNodeInsert, 1, values.getAsString(SizzoSchema.Contents.Columns.UID));
+		bindString(mWifiNodeInsert, 2, values.getAsString(SizzoSchema.Contents.Columns.TITLE));
+		bindString(mWifiNodeInsert, 3, values.getAsString(SizzoSchema.Contents.Columns.DETAIL));
+		bindString(mWifiNodeInsert, 4, "WIFI");
+		rowID = mWifiNodeInsert.executeInsert();
 		return rowID;
 	}
 
