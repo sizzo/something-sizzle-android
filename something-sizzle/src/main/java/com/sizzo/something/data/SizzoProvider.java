@@ -86,9 +86,9 @@ public class SizzoProvider extends AbstractSizzoProvider {
 		switch (matchNode) {
 		case SizzoUriMatcher.WIFIS:
 			mSizzoDBHelper.upsertContentWifiNode(values, null, null);
-			long rowID = mSizzoDBHelper.getContentId(values.getAsString(SizzoSchema.Contents.Columns.UID));
+			long rowID = mSizzoDBHelper.getContentId(values.getAsString(SizzoSchema.CONTENTS.Columns.UID));
 			if (rowID > 0) {
-				Uri nodeUri = ContentUris.withAppendedId(SizzoUriMatcher.WIFIS_URI, rowID);
+				Uri nodeUri = ContentUris.withAppendedId(SizzoUriMatcher.WIFIS_URI_ID, rowID);
 				getContext().getContentResolver().notifyChange(uri, null);
 				return nodeUri;
 			}
@@ -101,18 +101,62 @@ public class SizzoProvider extends AbstractSizzoProvider {
 
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+		Cursor cursor = null;
+		
+		int matchNode = uriMatcher.match(uri);
+		switch (matchNode) {
+		case SizzoUriMatcher.WIFIS:
+		case SizzoUriMatcher.WIFIS_ID:
+		case SizzoUriMatcher.WIFIS_UID:
+			cursor = queryWifiContents(uri, projection, selection, selectionArgs, sortOrder);
+			cursor.setNotificationUri(getContext().getContentResolver(), uri);
+			break;
+		case SizzoUriMatcher.USERS:
+		case SizzoUriMatcher.USERS_ID:
+		case SizzoUriMatcher.USERS_UID:
+			cursor = queryUserContents(uri, projection, selection, selectionArgs, sortOrder);
+			cursor.setNotificationUri(getContext().getContentResolver(), uri);
+			break;
+		default:
+			throw new IllegalArgumentException("Unknown Insert URI " + uri);
+		}
+		return cursor;
+	}
+
+	private Cursor queryWifiContents(Uri uri, String[] projection, String selection, String[] selectionArgs,
+			String sortOrder) {
+		Cursor cursor;
+		int matchNode = uriMatcher.match(uri);
 		SQLiteQueryBuilder sqlBuilder = new SQLiteQueryBuilder();
-		sqlBuilder.setTables(SizzoSchema.Contents.TABLE);
-		if (uriMatcher.match(uri) == SizzoUriMatcher.WIFIS_ID)
-			// ---if getting a particular book---
-			sqlBuilder.appendWhere(SizzoSchema.Contents.Columns._ID + "=" + uri.getPathSegments().get(1));
+		sqlBuilder.setTables(SizzoSchema.CONTENTS.TABLE);
+		if (matchNode == SizzoUriMatcher.WIFIS_ID) {
+			sqlBuilder.appendWhere(SizzoSchema.CONTENTS.Columns._ID + "=" + uri.getPathSegments().get(1));
+		} else if (matchNode == SizzoUriMatcher.WIFIS_UID) {
+			sqlBuilder.appendWhere(SizzoSchema.CONTENTS.Columns.UID + "=" + uri.getPathSegments().get(1));
+		}
 		if (sortOrder == null || sortOrder == "")
-			sortOrder = SizzoSchema.Contents.Columns.TITLE;
-		Cursor c = sqlBuilder.query(mSizzoDBHelper.getReadableDatabase(), projection, selection, selectionArgs, null,
+			sortOrder = SizzoSchema.CONTENTS.Columns.TITLE;
+		cursor = sqlBuilder.query(mSizzoDBHelper.getReadableDatabase(), projection, selection, selectionArgs, null,
 				null, sortOrder);
-		// ---register to watch a content URI for changes---
-		c.setNotificationUri(getContext().getContentResolver(), uri);
-		return c;
+		return cursor;
+	}
+
+	private Cursor queryUserContents(Uri uri, String[] projection, String selection, String[] selectionArgs,
+			String sortOrder) {
+		Cursor cursor;
+		int matchNode = uriMatcher.match(uri);
+		SQLiteQueryBuilder sqlBuilder = new SQLiteQueryBuilder();
+		sqlBuilder.setTables(SizzoSchema.USERS.TABLE);
+		if (matchNode == SizzoUriMatcher.WIFIS_ID) {
+			sqlBuilder.appendWhere(SizzoSchema.USERS.Columns._ID + "=" + uri.getPathSegments().get(1));
+		} else if (matchNode == SizzoUriMatcher.WIFIS_UID) {
+			sqlBuilder.appendWhere(SizzoSchema.USERS.Columns.UID + "=" + uri.getPathSegments().get(1));
+		}
+		if (sortOrder == null || sortOrder == "")
+			sortOrder = SizzoSchema.USERS.Columns.TITLE;
+		cursor = sqlBuilder.query(mSizzoDBHelper.getReadableDatabase(), projection, selection, selectionArgs, null,
+				null, sortOrder);
+		return cursor;
 	}
 
 	@Override
@@ -123,6 +167,7 @@ public class SizzoProvider extends AbstractSizzoProvider {
 		switch (matchNode) {
 		case SizzoUriMatcher.WIFIS:
 		case SizzoUriMatcher.WIFIS_ID:
+		case SizzoUriMatcher.WIFIS_UID:
 			mSizzoDBHelper.upsertContentWifiNode(values, selection, selectionArgs);
 			break;
 		default:

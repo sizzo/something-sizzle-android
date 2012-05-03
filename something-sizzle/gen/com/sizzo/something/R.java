@@ -15,17 +15,18 @@ public final class R {
         public static final int pic=0x7f020001;
     }
     public static final class id {
-        public static final int barcode=0x7f060009;
-        public static final int dynamicUserHome=0x7f060006;
-        public static final int history=0x7f060008;
+        public static final int barcode=0x7f06000a;
+        public static final int dynamicUserHome=0x7f060007;
+        public static final int history=0x7f060009;
         public static final int item_content=0x7f060004;
         public static final int listitem_content=0x7f060003;
         public static final int listitem_pic=0x7f060001;
         public static final int listitem_title=0x7f060002;
-        public static final int settings=0x7f06000a;
+        public static final int settings=0x7f06000b;
         public static final int webview=0x7f060000;
-        public static final int wifiListView=0x7f060005;
-        public static final int wifis=0x7f060007;
+        public static final int wifiCurrentView=0x7f060005;
+        public static final int wifiListView=0x7f060006;
+        public static final int wifis=0x7f060008;
     }
     public static final class layout {
         public static final int browser=0x7f030000;
@@ -42,6 +43,7 @@ public final class R {
         public static final int exitOption=0x7f040003;
         public static final int hello=0x7f040000;
         public static final int historyOption=0x7f040004;
+        public static final int wifi_current_information=0x7f040007;
         public static final int wifisOption=0x7f040005;
     }
 }

@@ -72,16 +72,16 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 
 	public interface Tables {
 		// public static final String CONTENTS = "contents";
-		public static final String CONTENT2CONTENTS = "content2contents";
+//		public static final String CONTENT2CONTENTS = "content2contents";
 		public static final String USERS = "users";
 		public static final String USER2USERS = "user2users";
 		public static final String USER2CONTENTS = "user2contents";
-		public static final String PROPERTIES = "properties";
+//		public static final String PROPERTIES = "properties";
 		public static final String FILES = "files";
 
 		// This list of tables contains auto-incremented sequences.
-		public static final String[] SEQUENCE_TABLES = new String[] { SizzoSchema.Contents.TABLE, CONTENT2CONTENTS,
-				USERS, USER2USERS, USER2CONTENTS, PROPERTIES, FILES, };
+		public static final String[] SEQUENCE_TABLES = new String[] { SizzoSchema.CONTENTS.TABLE, SizzoSchema.CONTENT2CONTENTS.TABLE,
+				USERS, USER2USERS, USER2CONTENTS, SizzoSchema.PROPERTIES.TABLE, FILES, };
 
 		/**
 		 * For {@link ContactsContract.DataUsageFeedback}. The table structure
@@ -251,16 +251,16 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		Log.i(TAG, "Bootstrapping database version: " + DATABASE_VERSION);
 
-		db.execSQL("CREATE TABLE " + SizzoSchema.Contents.TABLE + " (" + BaseColumns._ID
-				+ " INTEGER PRIMARY KEY AUTOINCREMENT," + SizzoSchema.Contents.Columns.UID + " TEXT,"
-				+ SizzoSchema.Contents.Columns.TITLE + " TEXT," + SizzoSchema.Contents.Columns.DETAIL + " TEXT,"
-				+ SizzoSchema.Contents.Columns.TYPE + " TEXT," 
-				+ SizzoSchema.Contents.Columns.RANK + " INTEGER," 
-				+ SizzoSchema.Contents.Columns.CRATEDDATE + " TEXT,"
-				+ SizzoSchema.Contents.Columns.LASTUPDATEDDATE + " TEXT );");
+		db.execSQL("CREATE TABLE " + SizzoSchema.CONTENTS.TABLE + " (" + BaseColumns._ID
+				+ " INTEGER PRIMARY KEY AUTOINCREMENT," + SizzoSchema.CONTENTS.Columns.UID + " TEXT,"
+				+ SizzoSchema.CONTENTS.Columns.TITLE + " TEXT," + SizzoSchema.CONTENTS.Columns.DETAIL + " TEXT,"
+				+ SizzoSchema.CONTENTS.Columns.TYPE + " TEXT," 
+				+ SizzoSchema.CONTENTS.Columns.RANK + " INTEGER," 
+				+ SizzoSchema.CONTENTS.Columns.CRATEDDATE + " TEXT,"
+				+ SizzoSchema.CONTENTS.Columns.LASTUPDATEDDATE + " TEXT );");
 
-		db.execSQL("CREATE INDEX content_has_uid_index ON " + SizzoSchema.Contents.TABLE + " ("
-				+ SizzoSchema.Contents.Columns.UID + ");");
+		db.execSQL("CREATE INDEX content_has_uid_index ON " + SizzoSchema.CONTENTS.TABLE + " ("
+				+ SizzoSchema.CONTENTS.Columns.UID + ");");
 
 		// When adding new tables, be sure to also add size-estimates in
 		// updateSqliteStats
@@ -320,8 +320,8 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 		if (oldVersion < 99) {
 			Log.i(TAG, "Upgrading from version " + oldVersion + " to " + newVersion + ", data will be lost!");
 
-			db.execSQL("DROP TABLE IF EXISTS " + SizzoSchema.Contents.TABLE + ";");
-			db.execSQL("DROP TABLE IF EXISTS " + Tables.PROPERTIES + ";");
+			db.execSQL("DROP TABLE IF EXISTS " + SizzoSchema.CONTENTS.TABLE + ";");
+			db.execSQL("DROP TABLE IF EXISTS " + SizzoSchema.PROPERTIES.TABLE + ";");
 			db.execSQL("DROP TABLE IF EXISTS " + Tables.USER2USERS + ";");
 			db.execSQL("DROP TABLE IF EXISTS " + Tables.USER2CONTENTS + ";");
 			db.execSQL("DROP TABLE IF EXISTS " + Tables.ACTIVITIES + ";");
@@ -404,14 +404,14 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 		// which can lead to catastrophic query plans for small tables
 		try {
 			db.execSQL("DELETE FROM sqlite_stat1");
-			updateIndexStats(db, SizzoSchema.Contents.TABLE, "contacts_has_phone_index", "9000 500");
-			updateIndexStats(db, SizzoSchema.Contents.TABLE, "contacts_name_raw_contact_id_index", "9000 1");
+			updateIndexStats(db, SizzoSchema.CONTENTS.TABLE, "contacts_has_phone_index", "9000 500");
+			updateIndexStats(db, SizzoSchema.CONTENTS.TABLE, "contacts_name_raw_contact_id_index", "9000 1");
 
-			updateIndexStats(db, Tables.PROPERTIES, "raw_contacts_source_id_index", "10000 1 1 1");
-			updateIndexStats(db, Tables.PROPERTIES, "raw_contacts_contact_id_index", "10000 2");
-			updateIndexStats(db, Tables.PROPERTIES, "raw_contact_sort_key2_index", "10000 2");
-			updateIndexStats(db, Tables.PROPERTIES, "raw_contact_sort_key1_index", "10000 2");
-			updateIndexStats(db, Tables.PROPERTIES, "raw_contacts_source_id_data_set_index", "10000 1 1 1 1");
+			updateIndexStats(db, SizzoSchema.PROPERTIES.TABLE, "raw_contacts_source_id_index", "10000 1 1 1");
+			updateIndexStats(db, SizzoSchema.PROPERTIES.TABLE, "raw_contacts_contact_id_index", "10000 2");
+			updateIndexStats(db, SizzoSchema.PROPERTIES.TABLE, "raw_contact_sort_key2_index", "10000 2");
+			updateIndexStats(db, SizzoSchema.PROPERTIES.TABLE, "raw_contact_sort_key1_index", "10000 2");
+			updateIndexStats(db, SizzoSchema.PROPERTIES.TABLE, "raw_contacts_source_id_data_set_index", "10000 1 1 1 1");
 		} catch (SQLException e) {
 			Log.e(TAG, "Could not update index stats", e);
 		}
@@ -452,9 +452,9 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 	public void wipeData() {
 		SQLiteDatabase db = getWritableDatabase();
 
-		db.execSQL("DELETE FROM " + SizzoSchema.Contents.TABLE + ";");
-		db.execSQL("DELETE FROM " + Tables.PROPERTIES + ";");
-		db.execSQL("DELETE FROM " + Tables.CONTENT2CONTENTS + ";");
+		db.execSQL("DELETE FROM " + SizzoSchema.CONTENTS.TABLE + ";");
+		db.execSQL("DELETE FROM " + SizzoSchema.PROPERTIES.TABLE + ";");
+		db.execSQL("DELETE FROM " + SizzoSchema.CONTENT2CONTENTS.TABLE + ";");
 		db.execSQL("DELETE FROM " + Tables.FILES + ";");
 		db.execSQL("DELETE FROM " + Tables.USERS + ";");
 
@@ -482,19 +482,19 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 	}
 
 	public void upsertContentWifiNode(ContentValues values, String selection, String[] selectionArgs) {
-		long rowID = getContentId(values.getAsString(SizzoSchema.Contents.Columns.UID));
+		long rowID = getContentId(values.getAsString(SizzoSchema.CONTENTS.Columns.UID));
 		if (rowID > 0) {
 			if (mStatementUpdateWifiNode == null) {
 				mStatementUpdateWifiNode = getWritableDatabase().compileStatement(
-						"UPDATE " + SizzoSchema.Contents.TABLE + " SET " + SizzoSchema.Contents.Columns.TITLE + "=?, "
-								+ SizzoSchema.Contents.Columns.DETAIL + "=?, " + SizzoSchema.Contents.Columns.TYPE
-								+ "=?, " + SizzoSchema.Contents.Columns.LASTUPDATEDDATE + "=date('now')" + " WHERE "
-								+ SizzoSchema.Contents.Columns.UID + "=?");
+						"UPDATE " + SizzoSchema.CONTENTS.TABLE + " SET " + SizzoSchema.CONTENTS.Columns.TITLE + "=?, "
+								+ SizzoSchema.CONTENTS.Columns.DETAIL + "=?, " + SizzoSchema.CONTENTS.Columns.TYPE
+								+ "=?, " + SizzoSchema.CONTENTS.Columns.LASTUPDATEDDATE + "=date('now')" + " WHERE "
+								+ SizzoSchema.CONTENTS.Columns.UID + "=?");
 			}
-			bindString(mStatementUpdateWifiNode, 1, values.getAsString(SizzoSchema.Contents.Columns.TITLE));
-			bindString(mStatementUpdateWifiNode, 2, values.getAsString(SizzoSchema.Contents.Columns.DETAIL));
-			bindString(mStatementUpdateWifiNode, 3, SizzoSchema.Contents.Types.WIFI.name());
-			bindString(mStatementUpdateWifiNode, 4, values.getAsString(SizzoSchema.Contents.Columns.UID));
+			bindString(mStatementUpdateWifiNode, 1, values.getAsString(SizzoSchema.CONTENTS.Columns.TITLE));
+			bindString(mStatementUpdateWifiNode, 2, values.getAsString(SizzoSchema.CONTENTS.Columns.DETAIL));
+			bindString(mStatementUpdateWifiNode, 3, SizzoSchema.CONTENTS.Types.WIFI.name());
+			bindString(mStatementUpdateWifiNode, 4, values.getAsString(SizzoSchema.CONTENTS.Columns.UID));
 			mStatementUpdateWifiNode.execute();
 		}
 	}
@@ -509,14 +509,14 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 		}
 		if (mStatementContentQueryByUid == null) {
 			mStatementContentQueryByUid = getWritableDatabase().compileStatement(
-					"SELECT " + SizzoSchema.Contents.Columns._ID + " FROM " + SizzoSchema.Contents.TABLE + " WHERE "
-							+ SizzoSchema.Contents.Columns.UID + "=?");
+					"SELECT " + SizzoSchema.CONTENTS.Columns._ID + " FROM " + SizzoSchema.CONTENTS.TABLE + " WHERE "
+							+ SizzoSchema.CONTENTS.Columns.UID + "=?");
 		}
 
 		if (mStatementContentInitInsert == null) {
 			mStatementContentInitInsert = getWritableDatabase().compileStatement(
-					"INSERT INTO " + SizzoSchema.Contents.TABLE + "(" + SizzoSchema.Contents.Columns.UID + ","
-							+ SizzoSchema.Contents.Columns.CRATEDDATE + ") VALUES (?,date('now'))");
+					"INSERT INTO " + SizzoSchema.CONTENTS.TABLE + "(" + SizzoSchema.CONTENTS.Columns.UID + ","
+							+ SizzoSchema.CONTENTS.Columns.CRATEDDATE + ") VALUES (?,date('now'))");
 		}
 		return lookupAndCacheId(mStatementContentQueryByUid, mStatementContentInitInsert, uid, mContentCache);
 	}
@@ -590,7 +590,7 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 	 * Returns the value from the {@link Tables#PROPERTIES} table.
 	 */
 	public String getProperty(String key, String defaultValue) {
-		Cursor cursor = getReadableDatabase().query(Tables.PROPERTIES,
+		Cursor cursor = getReadableDatabase().query(SizzoSchema.PROPERTIES.TABLE,
 				new String[] { PropertiesColumns.PROPERTY_VALUE }, PropertiesColumns.PROPERTY_KEY + "=?",
 				new String[] { key }, null, null, null);
 		String value = null;
@@ -616,7 +616,7 @@ public class SizzoDatabaseHelper extends SQLiteOpenHelper {
 		ContentValues values = new ContentValues();
 		values.put(PropertiesColumns.PROPERTY_KEY, key);
 		values.put(PropertiesColumns.PROPERTY_VALUE, value);
-		db.replace(Tables.PROPERTIES, null, values);
+		db.replace(SizzoSchema.PROPERTIES.TABLE, null, values);
 	}
 
 	/**
