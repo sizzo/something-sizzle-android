@@ -20,7 +20,7 @@ public class SizzoSchema {
 			public static final String RANK="RANK";
 		}
 		public enum Types{
-			WIFI
+			WIFI,ARTICLE
 		}
 	}
 

@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/dynamicUserHome"
+        android:id="@+id/peers"
         android:showAsAction="always"
-        android:title="@string/dynamicUserHomeOption">
+        android:title="@string/peersOption">
     </item>
     <item
         android:id="@+id/wifis"

@@ -23,7 +23,7 @@
     <application
         android:icon="@drawable/icon"
         android:label="@string/app_name" >
-        <activity android:name=".WifiActivity" >
+        <activity android:name=".PeersActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -32,6 +32,11 @@
         <activity
             android:name=".BrowserActivity"
             android:label="@string/browserTitle" >
+        </activity>
+
+        <activity
+            android:name=".WifiActivity"
+            android:label="@string/wifiTitle" >
         </activity>
 
         <receiver android:name=".service.ScheduleReceiver" >

@@ -3,13 +3,14 @@
     <string name="hello">Hello something-sizzle!</string>
     <string name="app_name">something-sizzle</string>
     
-    <string name="dynamicUserHomeOption">Rainbow</string>
     
     <string name="exitOption">Exit</string>
     <string name="historyOption">History</string>
+    <string name="peersOption">Peers</string>
     <string name="wifisOption">Wifis</string>
     <string name="browserTitle">Rainbow</string>
     <string name="wifi_current_information">wifi_current_information</string>
+    <string name="wifiTitle">Wifis</string>
     
      
     

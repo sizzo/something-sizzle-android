@@ -8,11 +8,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.sizzo.something.BrowserActivity;
-import com.sizzo.something.WifiActivity;
+import com.sizzo.something.PeersActivity;
 import com.sizzo.something.R;
+import com.sizzo.something.WifiActivity;
 
 public class OptionsMenu {
-	private static String TAG = "something-sizzle";
+	private static String TAG = "OptionsMenu";
 	private Activity activity;
 	private Menu menu;
 
@@ -28,9 +29,9 @@ public class OptionsMenu {
 	}
 
 	public boolean optionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.dynamicUserHome) {
-			Intent i = new Intent(activity, BrowserActivity.class);
-			i.putExtra("url", "http://wap.sohu.com" );
+		if (item.getItemId() == R.id.peers) {
+			Intent i = new Intent(activity, PeersActivity.class);
+//			i.putExtra("url", "http://wap.sohu.com" );
 			activity.startActivity(i);
 		} else if (item.getItemId() == R.id.wifis) {
 			Intent i = new Intent(activity, WifiActivity.class);
