@@ -9,5 +9,15 @@
 	</classpathentry>
 	<classpathentry kind="src" output="bin/classes" path="src/main/java"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER"/>
+	<classpathentry kind="lib" path="libs/alljoyn.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="something-sizzle/libs/armeabi"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="libs/bundle.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="something-sizzle/libs/armeabi"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
