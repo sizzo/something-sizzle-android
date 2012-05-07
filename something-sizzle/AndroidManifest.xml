@@ -19,13 +19,18 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.READ_CONTACTS" >
     </uses-permission>
-
+	<uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"></uses-permission>
+	<!-- Permission required to use the Bluetooth transport -->
+	<uses-permission android:name="android.permission.BLUETOOTH"></uses-permission>
+	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"></uses-permission>
+    
     <application
         android:icon="@drawable/icon"
         android:label="@string/app_name" >
         <activity android:name=".PeersActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -33,7 +38,6 @@
             android:name=".BrowserActivity"
             android:label="@string/browserTitle" >
         </activity>
-
         <activity
             android:name=".WifiActivity"
             android:label="@string/wifiTitle" >
@@ -46,7 +50,12 @@
         </receiver>
         <receiver android:name=".service.StartServiceReceiver" >
         </receiver>
+
         <service android:name=".service.jmdns.DiscoverService" >
+        </service>
+        <service android:name=".service.alljoyn.PeerServerService" >
+        </service>
+        <service android:name="org.alljoyn.bus.alljoyn.BundleDaemonService" >
         </service>
 
         <provider
