@@ -1,0 +1,10 @@
+<metadata>
+  <groupId>javax.jmdns</groupId>
+  <artifactId>jmdns</artifactId>
+  <versioning>
+    <versions>
+      <version>3.4.1</version>
+    </versions>
+    <lastUpdated>20120423154029</lastUpdated>
+  </versioning>
+</metadata>
