@@ -177,7 +177,6 @@ public class PeersActivity extends Activity {
 				Intent i = new Intent(activity, MyRolesActivity.class);
 				i.putExtra("url", "http://m.hao123.com?q=" + currentWifiInfoMap.get("SSID"));
 				activity.startActivity(i);
-				
 				Map map = wifiConfigurationAdapts.get(position);
 				map.put("DETAIL", "Change my role.....");
 				adapter.notifyDataSetChanged();

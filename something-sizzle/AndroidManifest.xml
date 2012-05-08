@@ -51,7 +51,7 @@
         </activity>
         <activity
             android:name=".MyRolesActivity"
-            android:label="@string/myRolesTitle" >
+            android:label="@string/peerChatTitle" >
         </activity>
         
         <receiver android:name=".service.ScheduleReceiver" >
