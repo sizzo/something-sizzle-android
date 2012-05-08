@@ -153,9 +153,12 @@ public class PeerChatActivity extends Activity {
 			i.putExtra("url", "http://m.hao123.com?q=" );
 			this.startActivity(i);
 	        return true;
-	    case R.id.recordVoice:
+	    case R.id.peerRecord:
 	    	finish();
 	        return true;
+	    case R.id.peerCall:
+	    	finish();
+	    	return true;
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }
