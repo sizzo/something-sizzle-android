@@ -12,7 +12,10 @@
     <string name="wifi_current_information">wifi_current_information</string>
     <string name="wifiTitle">Wifis</string>
     
-     
+     <string name="enter_message_hint">Enter message</string>
+     <string name="peerChatTitle">Peer Chat</string>
+     <string name="myRolesTitle">My Roles</string>
+    
     
     
     </resources>
