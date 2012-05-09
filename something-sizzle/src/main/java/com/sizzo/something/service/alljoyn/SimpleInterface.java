@@ -30,21 +30,22 @@ import org.alljoyn.bus.annotation.BusMethod;
 @BusInterface(name = "org.alljoyn.bus.samples.simple.SimpleInterface")
 public interface SimpleInterface {
 	/*
-	 * Name used as the well-known name and the advertised name. This name
-	 * must be a unique name both to the bus and to the network as a whole.
-	 * The name uses reverse URL style of naming.
+	 * Name used as the well-known name and the advertised name. This name must
+	 * be a unique name both to the bus and to the network as a whole. The name
+	 * uses reverse URL style of naming.
 	 */
-	 public static final String SERVICE_NAME = "org.alljoyn.bus.samples.simple";
+	public static final String SERVICE_NAME = "org.alljoyn.bus.samples.simple";
 	public static final short CONTACT_PORT = 42;
 
-    /*
-     * The BusMethod annotation signifies that this function should be used as part of the AllJoyn
-     * interface.  The runtime is smart enough to figure out what the input and output of the method
-     * is based on the input/output arguments of the Ping method.
-     *
-     * All methods that use the BusMethod annotation can throw a BusException and should indicate
-     * this fact.
-     */
-    @BusMethod
-    String Ping(String inStr) throws BusException;
+	/*
+	 * The BusMethod annotation signifies that this function should be used as
+	 * part of the AllJoyn interface. The runtime is smart enough to figure out
+	 * what the input and output of the method is based on the input/output
+	 * arguments of the Ping method.
+	 * 
+	 * All methods that use the BusMethod annotation can throw a BusException
+	 * and should indicate this fact.
+	 */
+	@BusMethod
+	String Ping(String inStr) throws BusException;
 }

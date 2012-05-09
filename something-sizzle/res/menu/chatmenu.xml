@@ -1,8 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu
-  xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-<item android:title="Home" android:id="@+id/peerHome"></item>
-<item android:title="Record" android:id="@+id/peerRecord"></item>
-<item android:title="Call" android:id="@+id/peerCall"></item>
+    <item
+        android:id="@+id/peerHome"
+        android:title="Home">
+    </item>
+    <item
+        android:id="@+id/peerRecord"
+        android:title="Record">
+    </item>
+    <item
+        android:id="@+id/peerCall"
+        android:title="Call">
+    </item>
+    <item
+        android:id="@+id/barcode"
+        android:showAsAction="ifRoom"
+        android:title="Barcode">
+    </item>
+
 </menu>

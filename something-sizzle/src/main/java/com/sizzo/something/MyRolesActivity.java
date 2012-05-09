@@ -1,26 +1,17 @@
 package com.sizzo.something;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
-import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.wifi.SupplicantState;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,10 +19,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.sizzo.something.menu.OptionsMenu;
 
@@ -48,10 +39,10 @@ public class MyRolesActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.peers);
-		adapter = new MyArrayAdapter<Map<String, Object>>(this, R.layout.peersitem, R.id.listitem_content,
+		setContentView(R.layout.myroles);
+		adapter = new MyArrayAdapter<Map<String, Object>>(this, R.layout.myrolesitem, R.id.listitem_content,
 				wifiConfigurationAdapts);
-		((ListView) findViewById(R.id.peerListView)).setAdapter(adapter);
+		((ListView) findViewById(R.id.myroleListView)).setAdapter(adapter);
 		this.initListView();
 	}
 
@@ -83,24 +74,20 @@ public class MyRolesActivity extends Activity {
 
 		super.onRestoreInstanceState(savedInstanceState);
 	}
- 
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 	}
 
-
-
 	private void initListView() {
 		final Activity activity = this;
 
 		initCurrentMyInfo();
 
-
 		initMyRolesInfo();
 
-		((ListView) findViewById(R.id.peerListView)).setOnItemClickListener(new OnItemClickListener() {
+		((ListView) findViewById(R.id.myroleListView)).setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 				if (wifiConfigurationAdapts != null && wifiConfigurationAdapts.get(position) != null) {
@@ -120,23 +107,51 @@ public class MyRolesActivity extends Activity {
 				}
 			}
 
-			private void handleFreeRoleItem(final Activity activity, final List<Map<String, Object>> wifiConfigurationAdapts,
-					final int position) {
+			private void handleFreeRoleItem(final Activity activity,
+					final List<Map<String, Object>> wifiConfigurationAdapts, final int position) {
+				EditText editText = new EditText(activity);
+				editText.setText((String)wifiConfigurationAdapts.get(position).get("TITLE"));
+				new AlertDialog.Builder(activity).setTitle("Change To Free Role").setView(editText)
+						.setPositiveButton("Confirm", new OnClickListener() {
 
-				new AlertDialog.Builder(activity).setTitle("Dialog for me to choose different role").show();
-				Map map = wifiConfigurationAdapts.get(position);
-				map.put("DETAIL", "Change my role.....");
-				adapter.notifyDataSetChanged();
+							@Override
+							public void onClick(DialogInterface arg0, int arg1) {
+								Map map = wifiConfigurationAdapts.get(position);
+								map.put("DETAIL", "Change my role.....");
+								adapter.notifyDataSetChanged();
+							}
+						}).setNegativeButton("Cancel", new OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								// TODO Auto-generated method stub
+
+							}
+						}).show();
 			}
-
-
 
 			private void handleVerifiedRoleItem(final Activity activity,
 					final List<Map<String, Object>> wifiConfigurationAdapts, final int position) {
-				//change my role
-				Intent i = new Intent(activity, PeersActivity.class);
-				i.putExtra("myCurrentRoleId", "5343" );
-				activity.startActivity(i);
+				TextView textView = new TextView(activity);
+				textView.setText("Please confirm change role to " + wifiConfigurationAdapts.get(position).get("TITLE"));
+				new AlertDialog.Builder(activity).setTitle("Change Role To ["+wifiConfigurationAdapts.get(position).get("TITLE")+"]?").setView(textView)
+						.setPositiveButton("Confirm", new OnClickListener() {
+							public void onClick(DialogInterface arg0, int arg1) {
+								// change my role
+								Intent i = new Intent(activity, PeersActivity.class);
+								i.putExtra("myCurrentRoleId", "5343");
+								activity.startActivity(i);
+							}
+						}).setNeutralButton("Update", new OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								Intent i = new Intent(activity, BrowserActivity.class);
+								i.putExtra("url", "http://m.hao123.com?q=");
+								activity.startActivity(i);
+							}
+						}).setNegativeButton("Cancel", new OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+							}
+						}).show();
 			}
 
 			private void handleDefaultItem(final Activity activity,
@@ -149,7 +164,7 @@ public class MyRolesActivity extends Activity {
 
 	private void initMyRolesInfo() {
 		Map<String, Object> map;
-		// proximity peers
+		// proximity myroles
 		for (int i = 0; i < 10; i++) {
 			map = new HashMap<String, Object>();
 			map.put("PIC", R.drawable.pic);

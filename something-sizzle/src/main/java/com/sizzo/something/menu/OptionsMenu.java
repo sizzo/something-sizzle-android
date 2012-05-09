@@ -33,16 +33,14 @@ public class OptionsMenu {
 			Intent i = new Intent(activity, PeersActivity.class);
 //			i.putExtra("url", "http://wap.sohu.com" );
 			activity.startActivity(i);
-		} else if (item.getItemId() == R.id.wifis) {
+		} else if (item.getItemId() == R.id.history) {
 			Intent i = new Intent(activity, WifiActivity.class);
 			activity.startActivity(i);
-		} else if (item.getItemId() == R.id.history) {
-		} else if (item.getItemId() == R.id.barcode) {
 		} else if (item.getItemId() == R.id.settings) {
 			Intent i = new Intent(activity, BrowserActivity.class);
 			i.putExtra("url", "file:///android_asset/html/setting.html" );
 			activity.startActivity(i);
-		}
+		} 
 		Log.i(TAG, "Selected Menu Item=[" + item.getTitle() + "]");
 		return false;
 	}

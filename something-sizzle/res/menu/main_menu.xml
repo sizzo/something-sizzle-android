@@ -7,30 +7,14 @@
         android:title="@string/peersOption">
     </item>
     <item
-        android:id="@+id/wifis"
+        android:id="@+id/history"
         android:showAsAction="always"
-        android:title="@string/wifisOption">
+        android:title="@string/historyOption">
     </item>
     <item
+        android:id="@+id/settings"
         android:showAsAction="ifRoom"
-        android:title="Tools...">
-        <menu>
-            <item
-                android:id="@+id/history"
-                android:showAsAction="ifRoom"
-                android:title="@string/historyOption">
-            </item>
-            <item
-                android:id="@+id/barcode"
-                android:showAsAction="ifRoom"
-                android:title="Barcode">
-            </item>
-            <item
-                android:id="@+id/settings"
-                android:showAsAction="ifRoom"
-                android:title="Settings">
-            </item>
-        </menu>
+        android:title="Settings">
     </item>
 
 </menu>
