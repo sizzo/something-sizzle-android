@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.sizzo.something;
+package com.sizzo.something.service.alljoyn;
 
 import org.alljoyn.bus.BusAttachment;
 import org.alljoyn.bus.BusException;
@@ -26,30 +26,22 @@ import org.alljoyn.bus.SessionListener;
 import org.alljoyn.bus.SessionOpts;
 import org.alljoyn.bus.Status;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
+import android.app.Service;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.sizzo.something.service.alljoyn.PeerServerService;
-import com.sizzo.something.service.alljoyn.SimpleInterface;
-
-public class PeerChatActivity extends Activity {
+public class PeerClientService extends Service {
 	/* Load the native alljoyn_java library. */
 	static {
 		System.loadLibrary("alljoyn_java");
@@ -90,7 +82,7 @@ public class PeerChatActivity extends Activity {
 				Toast.makeText(getApplicationContext(), (String) msg.obj, Toast.LENGTH_LONG).show();
 				break;
 			case MESSAGE_START_PROGRESS_DIALOG:
-				mDialog = ProgressDialog.show(PeerChatActivity.this, "", "Finding Simple Service.\nPlease wait...",
+				mDialog = ProgressDialog.show(PeerClientService.this, "", "Finding Simple Service.\nPlease wait...",
 						true, true);
 				break;
 			case MESSAGE_STOP_PROGRESS_DIALOG:
@@ -103,25 +95,23 @@ public class PeerChatActivity extends Activity {
 	};
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.peerchat);
+	public void onCreate() {
+		Log.v(TAG, "alljoyn server service Created");
 
-		mListViewArrayAdapter = new ArrayAdapter<String>(this, R.layout.message);
-		mListView = (ListView) findViewById(R.id.ListView);
-		mListView.setAdapter(mListViewArrayAdapter);
+		org.alljoyn.bus.alljoyn.DaemonInit.PrepareDaemon(getApplicationContext());
 
-		mEditText = (EditText) findViewById(R.id.EditText);
-		mEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
-				if (actionId == EditorInfo.IME_NULL && event.getAction() == KeyEvent.ACTION_UP) {
-					/* Call the remote object's Ping method. */
-					Message msg = mBusHandler.obtainMessage(BusHandler.PING, view.getText().toString());
-					mBusHandler.sendMessage(msg);
-				}
-				return true;
-			}
-		});
+	}
+
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		Log.v(TAG, "Peer Server service -- onStartCommand()");
+		startService();
+		// We want this service to continue running until it is explicitly
+		// stopped, so return sticky.
+		return START_STICKY;
+	}
+
+	private void startService() {
 
 		/*
 		 * Make all AllJoyn calls through a separate handler thread to prevent
@@ -139,36 +129,11 @@ public class PeerChatActivity extends Activity {
 
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.chatmenu, menu);
-		this.menu = menu;
-		return true;
-	}
+
+
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle item selection
-		switch (item.getItemId()) {
-		case R.id.peerHome:
-			Intent i = new Intent(this, BrowserActivity.class);
-			i.putExtra("url", "http://m.hao123.com?q=");
-			this.startActivity(i);
-			return true;
-		case R.id.peerRecord:
-			finish();
-			return true;
-		case R.id.peerCall:
-			finish();
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-	}
-
-	@Override
-	protected void onDestroy() {
+	public void onDestroy() {
 		super.onDestroy();
 
 		/* Disconnect to prevent resource leaks. */
@@ -265,7 +230,6 @@ public class PeerChatActivity extends Activity {
 				Status status = mBus.connect();
 				logStatus("BusAttachment.connect()", status);
 				if (Status.OK != status) {
-					finish();
 					return;
 				}
 
@@ -279,7 +243,6 @@ public class PeerChatActivity extends Activity {
 				status = mBus.findAdvertisedName(SERVICE_NAME);
 				logStatus(String.format("BusAttachement.findAdvertisedName(%s)", SERVICE_NAME), status);
 				if (Status.OK != status) {
-					finish();
 					return;
 				}
 
@@ -434,5 +397,11 @@ public class PeerChatActivity extends Activity {
 	 */
 	private void logInfo(String msg) {
 		Log.i(TAG, msg);
+	}
+
+	@Override
+	public IBinder onBind(Intent arg0) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

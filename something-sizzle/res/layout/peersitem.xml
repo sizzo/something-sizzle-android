@@ -17,6 +17,7 @@
 	    android:layout_alignWithParentIfMissing="true"
 	    android:layout_toRightOf="@+id/listitem_pic"
 	    android:gravity="center_vertical"
+	    android:singleLine="true"
 	    android:text="@+id/listitem_title"
 	    android:textSize="32px" />
 
@@ -29,8 +30,8 @@
 	    android:layout_below="@+id/listitem_title"
 	    android:layout_toRightOf="@+id/listitem_pic"
 	    android:ellipsize="marquee"
-	    android:singleLine="true"
+	    android:maxLines="4"
 	    android:text="@+id/item_content"
-	    android:textSize="18px" />
+	    android:textSize="22px" />
 
 </RelativeLayout>

@@ -42,7 +42,7 @@ public class PeerServerService extends Service {
 		System.loadLibrary("alljoyn_java");
 	}
 
-	private static final String TAG = "SimpleService";
+	private static final String TAG = "PeerServerService";
 
 	private static final int MESSAGE_PING = 1;
 	private static final int MESSAGE_PING_REPLY = 2;
@@ -222,7 +222,7 @@ public class PeerServerService extends Service {
 
 					SessionOpts sessionOpts = new SessionOpts();
 					sessionOpts.traffic = SessionOpts.TRAFFIC_MESSAGES;
-					sessionOpts.isMultipoint = false;
+					sessionOpts.isMultipoint = true;
 					sessionOpts.proximity = SessionOpts.PROXIMITY_ANY;
 					sessionOpts.transports = SessionOpts.TRANSPORT_ANY;
 
@@ -235,7 +235,16 @@ public class PeerServerService extends Service {
 								return false;
 							}
 						}
+
+						@Override
+						public void sessionJoined(short sessionPort, int sessionId, String joiner) {
+							Log.i(TAG, String.format(
+									"BusListener.sessionJoined(sessionId=%d sessionPort=%d joiner=%s)", sessionId,
+									sessionPort, joiner));
+							super.sessionJoined(sessionPort, sessionPort, joiner);
+						}
 					});
+
 					logStatus(
 							String.format("BusAttachment.bindSessionPort(%d, %s)", contactPort.value,
 									sessionOpts.toString()), status);

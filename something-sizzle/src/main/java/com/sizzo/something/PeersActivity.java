@@ -36,6 +36,9 @@ import android.widget.Toast;
 import com.sizzo.something.menu.OptionsMenu;
 
 public class PeersActivity extends Activity {
+	static {
+		System.loadLibrary("alljoyn_java");
+	}
 	private static String TAG = "something-sizzle";
 	OptionsMenu optionsMenu;
 	private BroadcastReceiver wifiStateReceiver;
@@ -58,6 +61,7 @@ public class PeersActivity extends Activity {
 		((ListView) findViewById(R.id.peerListView)).setAdapter(adapter);
 		this.initListView();
 		OpenWifi();
+		org.alljoyn.bus.alljoyn.DaemonInit.PrepareDaemon(getApplicationContext());
 	}
 
 	@Override
@@ -212,7 +216,7 @@ public class PeersActivity extends Activity {
 			map = new HashMap<String, Object>();
 			map.put("PIC", R.drawable.pic);
 			map.put("TITLE", "Lulu 00" + i);
-			map.put("DETAIL", "主页：http://www.lulu00" + i + ".com.cn");
+			map.put("DETAIL", "主页：http://www.lulu00" + i + ".com.cn 简介简介简介简介简介简介简介简介简介简介简介简介简介简介简介简介简介简介简介介简介简介简介简介简介简介简介简介简介简介简介简介简介简介");
 			map.put("TYPE", ItemType.PEER);
 			wifiConfigurationAdapts.add(map);
 			adapter.notifyDataSetChanged();
