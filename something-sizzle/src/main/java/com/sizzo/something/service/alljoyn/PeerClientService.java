@@ -26,19 +26,19 @@ import org.alljoyn.bus.SessionListener;
 import org.alljoyn.bus.SessionOpts;
 import org.alljoyn.bus.Status;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.Messenger;
 import android.util.Log;
-import android.view.Menu;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Toast;
 
 public class PeerClientService extends Service {
@@ -47,36 +47,52 @@ public class PeerClientService extends Service {
 		System.loadLibrary("alljoyn_java");
 	}
 
-	private static final int MESSAGE_PING = 1;
+	public static final int MESSAGE_PING = 1;
 	private static final int MESSAGE_PING_REPLY = 2;
 	private static final int MESSAGE_POST_TOAST = 3;
 	private static final int MESSAGE_START_PROGRESS_DIALOG = 4;
 	private static final int MESSAGE_STOP_PROGRESS_DIALOG = 5;
 
+	public static final String FILENAME = "fileName";
+	public static final String URLPATH = "urlPath";
+	public static final String RESULTPATH = "urlPath";
+
 	private static final String TAG = "PeerChatActivity";
 
-	private EditText mEditText;
+	// private EditText mEditText;
 	private ArrayAdapter<String> mListViewArrayAdapter;
-	private ListView mListView;
-	private Menu menu;
 
 	/* Handler used to make calls to AllJoyn methods. See onCreate(). */
 	private BusHandler mBusHandler;
 
 	private ProgressDialog mDialog;
 
-	private Handler mHandler = new Handler() {
+	private Handler mIncomingHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case MESSAGE_PING:
-				String ping = (String) msg.obj;
-				mListViewArrayAdapter.add("Ping:  " + ping);
+				Log.e("MESSAGE", "Got message");
+				Bundle data = msg.getData();
+				String urlPath = data.getString(PeerClientService.URLPATH);
+				String fileName = data.getString(PeerClientService.FILENAME);
+
+				Message backMsg = Message.obtain();
+				backMsg.arg1 = Activity.RESULT_OK;
+				Bundle bundle = new Bundle();
+				bundle.putString(RESULTPATH, "PeerClientService Pong:" + urlPath);
+				backMsg.setData(bundle);
+
+				try {
+					outMessenger.send(backMsg);
+				} catch (android.os.RemoteException e1) {
+					Log.w(getClass().getName(), "Exception sending message", e1);
+				}
 				break;
 			case MESSAGE_PING_REPLY:
 				String ret = (String) msg.obj;
 				mListViewArrayAdapter.add("Reply:  " + ret);
-				mEditText.setText("");
+				// mEditText.setText("");
 				break;
 			case MESSAGE_POST_TOAST:
 				Toast.makeText(getApplicationContext(), (String) msg.obj, Toast.LENGTH_LONG).show();
@@ -93,6 +109,21 @@ public class PeerClientService extends Service {
 			}
 		}
 	};
+	// Used to receive messages from the Activity
+	final Messenger inMessenger = new Messenger(mIncomingHandler);
+	// Use to send message to the Activity
+	private Messenger outMessenger;
+
+	@Override
+	public IBinder onBind(Intent intent) {
+		Bundle extras = intent.getExtras();
+		// Get messager from the Activity
+		if (extras != null) {
+			outMessenger = (Messenger) extras.get("MESSENGER");
+		}
+		// Return our messenger to the Activity to get commands
+		return inMessenger.getBinder();
+	}
 
 	@Override
 	public void onCreate() {
@@ -112,32 +143,30 @@ public class PeerClientService extends Service {
 	}
 
 	private void startService() {
+		if (mBusHandler == null) {
+			/*
+			 * Make all AllJoyn calls through a separate handler thread to
+			 * prevent blocking the UI.
+			 */
+			HandlerThread busThread = new HandlerThread("BusHandler");
+			busThread.start();
+			mBusHandler = new BusHandler(busThread.getLooper());
 
-		/*
-		 * Make all AllJoyn calls through a separate handler thread to prevent
-		 * blocking the UI.
-		 */
-		HandlerThread busThread = new HandlerThread("BusHandler");
-		busThread.start();
-		mBusHandler = new BusHandler(busThread.getLooper());
-
-		/* Connect to an AllJoyn object. */
-		mBusHandler.sendEmptyMessage(BusHandler.CONNECT);
-		mHandler.sendEmptyMessage(MESSAGE_START_PROGRESS_DIALOG);
-		Intent i = new Intent(this, PeerServerService.class);
-		this.startService(i);
-
+			/* Connect to an AllJoyn object. */
+			mBusHandler.sendEmptyMessage(BusHandler.CONNECT);
+			mIncomingHandler.sendEmptyMessage(MESSAGE_START_PROGRESS_DIALOG);
+			Intent i = new Intent(this, PeerServerService.class);
+			this.startService(i);
+		}
 	}
-
-
-
 
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
-
 		/* Disconnect to prevent resource leaks. */
 		mBusHandler.sendEmptyMessage(BusHandler.DISCONNECT);
+		mBusHandler = null;
+		super.onDestroy();
+
 	}
 
 	/* This class will handle all AllJoyn calls. See onCreate(). */
@@ -275,7 +304,7 @@ public class PeerClientService extends Service {
 					public void sessionLost(int sessionId) {
 						mIsConnected = false;
 						logInfo(String.format("MyBusListener.sessionLost(%d)", sessionId));
-						mHandler.sendEmptyMessage(MESSAGE_START_PROGRESS_DIALOG);
+						mIncomingHandler.sendEmptyMessage(MESSAGE_START_PROGRESS_DIALOG);
 					}
 
 					@Override
@@ -325,7 +354,7 @@ public class PeerClientService extends Service {
 
 					mSessionId = sessionId.value;
 					mIsConnected = true;
-					mHandler.sendEmptyMessage(MESSAGE_STOP_PROGRESS_DIALOG);
+					mIncomingHandler.sendEmptyMessage(MESSAGE_STOP_PROGRESS_DIALOG);
 				}
 				break;
 			}
@@ -368,7 +397,7 @@ public class PeerClientService extends Service {
 
 		/* Helper function to send a message to the UI thread. */
 		private void sendUiMessage(int what, Object obj) {
-			mHandler.sendMessage(mHandler.obtainMessage(what, obj));
+			mIncomingHandler.sendMessage(mIncomingHandler.obtainMessage(what, obj));
 		}
 	}
 
@@ -377,16 +406,16 @@ public class PeerClientService extends Service {
 		if (status == Status.OK) {
 			Log.i(TAG, log);
 		} else {
-			Message toastMsg = mHandler.obtainMessage(MESSAGE_POST_TOAST, log);
-			mHandler.sendMessage(toastMsg);
+			Message toastMsg = mIncomingHandler.obtainMessage(MESSAGE_POST_TOAST, log);
+			mIncomingHandler.sendMessage(toastMsg);
 			Log.e(TAG, log);
 		}
 	}
 
 	private void logException(String msg, BusException ex) {
 		String log = String.format("%s: %s", msg, ex);
-		Message toastMsg = mHandler.obtainMessage(MESSAGE_POST_TOAST, log);
-		mHandler.sendMessage(toastMsg);
+		Message toastMsg = mIncomingHandler.obtainMessage(MESSAGE_POST_TOAST, log);
+		mIncomingHandler.sendMessage(toastMsg);
 		Log.e(TAG, log, ex);
 	}
 
@@ -399,9 +428,4 @@ public class PeerClientService extends Service {
 		Log.i(TAG, msg);
 	}
 
-	@Override
-	public IBinder onBind(Intent arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

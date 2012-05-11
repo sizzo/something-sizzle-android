@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.sizzo.something.service.alljoyn.PeerClientService;
 import com.sizzo.something.service.alljoyn.PeerServerService;
 import com.sizzo.something.service.jmdns.DiscoverService;
 
@@ -16,5 +17,8 @@ public class StartServiceReceiver extends BroadcastReceiver {
 		
 		Intent peerServer = new Intent(context, PeerServerService.class);
 		context.startService(peerServer); 
+
+		Intent peerClient = new Intent(context, PeerClientService.class);
+		context.startService(peerClient); 
 	}
 }

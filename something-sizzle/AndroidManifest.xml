@@ -53,7 +53,7 @@
             android:name=".MyRolesActivity"
             android:label="@string/myRolesTitle" >
         </activity>
-        
+
         <receiver android:name=".service.ScheduleReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -64,13 +64,30 @@
         <receiver android:name=".service.StartServiceReceiver" >
         </receiver>
 
-        <service android:name=".service.jmdns.DiscoverService" >
+        <service
+            android:name=".service.jmdns.DiscoverService"
+            android:icon="@drawable/icon"
+            android:label="@string/discoverServer"
+            android:process=":discoverserver" >
         </service>
-        <service android:name=".service.alljoyn.PeerServerService" >
+        <service
+            android:name=".service.alljoyn.PeerClientService"
+            android:icon="@drawable/icon"
+            android:label="@string/clientservice"
+            android:process=":clientserver" >
         </service>
-        <service android:name="org.alljoyn.bus.alljoyn.BundleDaemonService" >
+        <service
+            android:name=".service.alljoyn.PeerServerService"
+            android:icon="@drawable/icon"
+            android:label="@string/peerserver"
+            android:process=":peerserver" >
         </service>
-
+        <service
+            android:name="org.alljoyn.bus.alljoyn.BundleDaemonService"
+            android:icon="@drawable/icon"
+            android:label="@string/alljoyndaemon"
+            android:process=".alljoyndaemon" >
+        </service>
         <provider
             android:name=".data.SizzoProvider"
             android:authorities="com.sizzo.data"

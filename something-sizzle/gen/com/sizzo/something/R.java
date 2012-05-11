@@ -51,8 +51,11 @@ public final class R {
         public static final int main_menu=0x7f050001;
     }
     public static final class string {
+        public static final int alljoyndaemon=0x7f04000c;
         public static final int app_name=0x7f040001;
         public static final int browserTitle=0x7f040006;
+        public static final int clientservice=0x7f04000f;
+        public static final int discoverServer=0x7f04000e;
         public static final int enter_message_hint=0x7f040009;
         public static final int exitOption=0x7f040002;
         public static final int hello=0x7f040000;
@@ -60,6 +63,7 @@ public final class R {
         public static final int myRolesTitle=0x7f04000b;
         public static final int peerChatTitle=0x7f04000a;
         public static final int peersOption=0x7f040004;
+        public static final int peerserver=0x7f04000d;
         public static final int wifiTitle=0x7f040008;
         public static final int wifi_current_information=0x7f040007;
         public static final int wifisOption=0x7f040005;
