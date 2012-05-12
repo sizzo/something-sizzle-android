@@ -2,6 +2,7 @@ package com.sizzo.something;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
@@ -101,4 +102,15 @@ public class BrowserActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		return optionsMenu.optionsItemSelected(item);
 	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		String url = intent.getExtras().getString("url");
+		if(url!=null){
+			webview.loadUrl(url);			
+		}
+		super.onNewIntent(intent);
+	}
+	
+	
 }

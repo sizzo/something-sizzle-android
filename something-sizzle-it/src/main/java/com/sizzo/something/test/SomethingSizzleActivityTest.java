@@ -3,14 +3,14 @@ package com.sizzo.something.test;
 import android.test.ActivityInstrumentationTestCase2;
 import com.sizzo.something.*;
 
-public class SomethingSizzleActivityTest extends ActivityInstrumentationTestCase2<WifiActivity> {
+public class SomethingSizzleActivityTest extends ActivityInstrumentationTestCase2<PeersActivity> {
 
     public SomethingSizzleActivityTest() {
-        super(WifiActivity.class); 
+        super(PeersActivity.class); 
     }
 
     public void testActivity() {
-        WifiActivity activity = getActivity();
+        PeersActivity activity = getActivity();
         assertNotNull(activity);
     }
 }

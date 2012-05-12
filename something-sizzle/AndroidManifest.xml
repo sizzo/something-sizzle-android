@@ -38,14 +38,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".BrowserActivity"
-            android:label="@string/browserTitle" >
-        </activity>
-        <activity
-            android:name=".WifiActivity"
-            android:label="@string/wifiTitle" >
-        </activity>
-        <activity
             android:name=".PeerChatActivity"
             android:label="@string/peerChatTitle" >
         </activity>
@@ -53,7 +45,11 @@
             android:name=".MyRolesActivity"
             android:label="@string/myRolesTitle" >
         </activity>
-
+        <activity
+            android:name=".BrowserActivity"
+            android:label="@string/browserTitle" >
+        </activity>
+        
         <receiver android:name=".service.ScheduleReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -67,26 +63,26 @@
         <service
             android:name=".service.jmdns.DiscoverService"
             android:icon="@drawable/icon"
-            android:label="@string/discoverServer"
-            android:process=":discoverserver" >
+            android:label="@string/discoverservice"
+            android:process=":discoverservvice" >
         </service>
         <service
             android:name=".service.alljoyn.PeerClientService"
             android:icon="@drawable/icon"
-            android:label="@string/clientservice"
-            android:process=":clientserver" >
+            android:label="@string/peerclientservice"
+            android:process=":peerclientservice" >
         </service>
         <service
             android:name=".service.alljoyn.PeerServerService"
             android:icon="@drawable/icon"
-            android:label="@string/peerserver"
-            android:process=":peerserver" >
+            android:label="@string/peerserverservice"
+            android:process=":peerserverservice" >
         </service>
         <service
             android:name="org.alljoyn.bus.alljoyn.BundleDaemonService"
             android:icon="@drawable/icon"
-            android:label="@string/alljoyndaemon"
-            android:process=".alljoyndaemon" >
+            android:label="@string/alljoyndaemonservice"
+            android:process=".alljoyndaemonservice" >
         </service>
         <provider
             android:name=".data.SizzoProvider"

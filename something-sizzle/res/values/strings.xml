@@ -15,10 +15,10 @@
      <string name="enter_message_hint">Enter message</string>
      <string name="peerChatTitle">Peer Chat</string>
      <string name="myRolesTitle">My Roles</string>
-     <string name="alljoyndaemon">Alljoyn Daemon</string>
-     <string name="peerserver">Peer Server</string>
-     <string name="discoverServer">Discover Server</string>
-     <string name="clientservice">Client Service</string>
+     <string name="alljoyndaemonservice">Alljoyn Daemon</string>
+     <string name="peerserverservice">Peer Server</string>
+     <string name="discoverservice">Discover Server</string>
+     <string name="peerclientservice">Client Service</string>
     
     
     

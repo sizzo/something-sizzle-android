@@ -8,9 +8,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.sizzo.something.BrowserActivity;
+import com.sizzo.something.HistoryActivity;
 import com.sizzo.something.PeersActivity;
 import com.sizzo.something.R;
-import com.sizzo.something.WifiActivity;
+import com.sizzo.something.SettingsActivity;
 
 public class OptionsMenu {
 	private static String TAG = "OptionsMenu";
@@ -34,10 +35,10 @@ public class OptionsMenu {
 //			i.putExtra("url", "http://wap.sohu.com" );
 			activity.startActivity(i);
 		} else if (item.getItemId() == R.id.history) {
-			Intent i = new Intent(activity, WifiActivity.class);
+			Intent i = new Intent(activity, HistoryActivity.class);
 			activity.startActivity(i);
 		} else if (item.getItemId() == R.id.settings) {
-			Intent i = new Intent(activity, BrowserActivity.class);
+			Intent i = new Intent(activity, SettingsActivity.class);
 			i.putExtra("url", "file:///android_asset/html/setting.html" );
 			activity.startActivity(i);
 		} 

@@ -56,24 +56,6 @@ public class PeerServerService extends Service {
 	private HandlerThread busThread = null;
 	private List<String> mListViewArrayAdapter = new ArrayList<String>();
 
-	private Handler mHandler = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			switch (msg.what) {
-			case MESSAGE_PING:
-				String ping = (String) msg.obj;
-				mListViewArrayAdapter.add("Ping:  " + ping);
-				// save to database
-				break;
-			case MESSAGE_PING_REPLY:
-				String reply = (String) msg.obj;
-				mListViewArrayAdapter.add("Reply:  " + reply);
-				break;
-			default:
-				break;
-			}
-		}
-	};
 
 	@Override
 	public void onCreate() {
@@ -134,17 +116,10 @@ public class PeerServerService extends Service {
 		 */
 		public String Ping(String inStr) {
 			String pongStr = "PeerServerService Pong:" + inStr;
-			sendUiMessage(MESSAGE_PING, inStr);
-
-			/* Simply echo the ping message. */
-			sendUiMessage(MESSAGE_PING_REPLY, pongStr);
 			return pongStr;
 		}
 
-		/* Helper function to send a message to the UI thread. */
-		private void sendUiMessage(int what, Object obj) {
-			mHandler.sendMessage(mHandler.obtainMessage(what, obj));
-		}
+
 	}
 
 	/* This class will handle all AllJoyn calls. See onCreate(). */
@@ -185,7 +160,33 @@ public class PeerServerService extends Service {
 					/*
 					 * Create a bus listener class
 					 */
-					mBus.registerBusListener(new BusListener());
+					mBus.registerBusListener(new BusListener(){
+
+						@Override
+						public void busStopping() {
+							// TODO Auto-generated method stub
+							super.busStopping();
+						}
+
+						@Override
+						public void foundAdvertisedName(String arg0, short arg1, String arg2) {
+							// TODO Auto-generated method stub
+							super.foundAdvertisedName(arg0, arg1, arg2);
+						}
+
+						@Override
+						public void lostAdvertisedName(String arg0, short arg1, String arg2) {
+							// TODO Auto-generated method stub
+							super.lostAdvertisedName(arg0, arg1, arg2);
+						}
+
+						@Override
+						public void nameOwnerChanged(String arg0, String arg1, String arg2) {
+							// TODO Auto-generated method stub
+							super.nameOwnerChanged(arg0, arg1, arg2);
+						}
+						
+					});
 					/*
 					 * To make a service available to other AllJoyn peers, first
 					 * register a BusObject with the BusAttachment at a specific
@@ -241,7 +242,7 @@ public class PeerServerService extends Service {
 							Log.i(TAG, String.format(
 									"BusListener.sessionJoined(sessionId=%d sessionPort=%d joiner=%s)", sessionId,
 									sessionPort, joiner));
-							super.sessionJoined(sessionPort, sessionPort, joiner);
+							super.sessionJoined(sessionPort, sessionId, joiner);
 						}
 					});
 
@@ -288,6 +289,7 @@ public class PeerServerService extends Service {
 
 				/* Release all resources acquired in connect. */
 			case DISCONNECT: {
+				Log.i(TAG,"PeerServerService DISCONNECT....");
 				/*
 				 * It is important to unregister the BusObject before
 				 * disconnecting from the bus. Failing to do so could result in
@@ -313,8 +315,6 @@ public class PeerServerService extends Service {
 		if (status == Status.OK) {
 			Log.i(TAG, log);
 		} else {
-			Message toastMsg = mHandler.obtainMessage(MESSAGE_POST_TOAST, log);
-			mHandler.sendMessage(toastMsg);
 			Log.e(TAG, log);
 		}
 	}

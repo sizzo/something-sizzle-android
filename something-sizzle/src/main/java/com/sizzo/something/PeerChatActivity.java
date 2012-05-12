@@ -63,38 +63,41 @@ public class PeerChatActivity extends Activity {
 	private ProgressDialog mDialog;
 
 	/** Messenger for communicating with the service. */
-	Messenger mMessenger = null;
+	Messenger mPeerClientServiceMessenger = null;
 
 	/** Flag indicating whether we have called bind on the service. */
-	boolean mBound;
+	boolean mPeerClientServiceBound = false;
 
 	/**
 	 * Class for interacting with the main interface of the service.
 	 */
-	private ServiceConnection mServiceConnection = new ServiceConnection() {
+	private ServiceConnection mPeerClientServiceConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			// This is called when the connection with the service has been
 			// established, giving us the object we can use to
 			// interact with the service. We are communicating with the
 			// service using a Messenger, so here we get a client-side
 			// representation of that from the raw IBinder object.
-			mMessenger = new Messenger(service);
-			mBound = true;
+			mPeerClientServiceMessenger = new Messenger(service);
+			mPeerClientServiceBound = true;
+			Toast.makeText(getApplicationContext(), "onServiceConnected.........", Toast.LENGTH_LONG).show();
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
 			// This is called when the connection with the service has been
 			// unexpectedly disconnected -- that is, its process crashed.
-			mMessenger = null;
-			mBound = false;
+			mPeerClientServiceMessenger = null;
+			mPeerClientServiceBound = false;
+			Toast.makeText(getApplicationContext(), "onServiceDisconnected.........", Toast.LENGTH_LONG).show();
 		}
 	};
+
 	private Handler handler = new Handler() {
 		public void handleMessage(Message message) {
 			Bundle data = message.getData();
 			if (message.arg1 == RESULT_OK && data != null) {
 				String text = data.getString(PeerClientService.RESULTPATH);
-				Toast.makeText(PeerChatActivity.this, text, Toast.LENGTH_LONG).show();
+				Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
 			}
 		}
 	};
@@ -102,24 +105,26 @@ public class PeerChatActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		Toast.makeText(this, "OnResume called", Toast.LENGTH_SHORT).show();
-		Intent intent = null;
-		intent = new Intent(this, PeerClientService.class);
-		// Create a new Messenger for the communication back
-		// From the Service to the Activity
-		Messenger messenger = new Messenger(handler);
-		intent.putExtra("MESSENGER", messenger);
+		if (mPeerClientServiceMessenger == null || !mPeerClientServiceBound) {
+			Intent intent = null;
+			intent = new Intent(this, PeerClientService.class);
+			// Create a new Messenger for the communication back
+			// From the PeerClientService to the Activity
+			Messenger mPeerClientMessenger = new Messenger(handler);
+			intent.putExtra("MESSENGER", mPeerClientMessenger);
 
-		bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+			bindService(intent, mPeerClientServiceConnection, Context.BIND_AUTO_CREATE);
+		}
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		unbindService(mServiceConnection);
+		// unbindService(mPeerClientServiceConnection);
 	}
 
 	private void ping(TextView view) {
-		if (!mBound)
+		if (!mPeerClientServiceBound)
 			return;
 		// Create and send a message to the service, using a supported 'what'
 		// value
@@ -127,9 +132,9 @@ public class PeerChatActivity extends Activity {
 		try {
 			Bundle bundle = new Bundle();
 			bundle.putString(PeerClientService.FILENAME, view.getText().toString());
-			bundle.putString(PeerClientService.URLPATH, "http://www.vogella.com/index.html");
+			bundle.putString(PeerClientService.URLPATH, view.getText().toString());
 			msg.setData(bundle);
-			mMessenger.send(msg);
+			mPeerClientServiceMessenger.send(msg);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}

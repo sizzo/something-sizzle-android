@@ -27,7 +27,6 @@ import org.alljoyn.bus.SessionOpts;
 import org.alljoyn.bus.Status;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
@@ -37,8 +36,8 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.RemoteException;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 public class PeerClientService extends Service {
@@ -57,17 +56,16 @@ public class PeerClientService extends Service {
 	public static final String URLPATH = "urlPath";
 	public static final String RESULTPATH = "urlPath";
 
-	private static final String TAG = "PeerChatActivity";
-
-	// private EditText mEditText;
-	private ArrayAdapter<String> mListViewArrayAdapter;
+	private static final String TAG = "PeerClientService";
 
 	/* Handler used to make calls to AllJoyn methods. See onCreate(). */
-	private BusHandler mBusHandler;
+	private AlljoynBusHandler mBusHandler = null;
 
-	private ProgressDialog mDialog;
+	// Use to send message to the Activity
+	private Messenger mOutgoingMessenger = null;
 
-	private Handler mIncomingHandler = new Handler() {
+	// Used to receive messages from the Activity
+	final Messenger mIncomingMessenger = new Messenger(new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
@@ -77,52 +75,51 @@ public class PeerClientService extends Service {
 				String urlPath = data.getString(PeerClientService.URLPATH);
 				String fileName = data.getString(PeerClientService.FILENAME);
 
-				Message backMsg = Message.obtain();
-				backMsg.arg1 = Activity.RESULT_OK;
-				Bundle bundle = new Bundle();
-				bundle.putString(RESULTPATH, "PeerClientService Pong:" + urlPath);
-				backMsg.setData(bundle);
+				Message alljoyMsg = getAlljoynBusHandler().obtainMessage(AlljoynBusHandler.PING, urlPath);
+				getAlljoynBusHandler().sendMessage(alljoyMsg);
 
-				try {
-					outMessenger.send(backMsg);
-				} catch (android.os.RemoteException e1) {
-					Log.w(getClass().getName(), "Exception sending message", e1);
-				}
-				break;
-			case MESSAGE_PING_REPLY:
-				String ret = (String) msg.obj;
-				mListViewArrayAdapter.add("Reply:  " + ret);
-				// mEditText.setText("");
 				break;
 			case MESSAGE_POST_TOAST:
 				Toast.makeText(getApplicationContext(), (String) msg.obj, Toast.LENGTH_LONG).show();
 				break;
 			case MESSAGE_START_PROGRESS_DIALOG:
-				mDialog = ProgressDialog.show(PeerClientService.this, "", "Finding Simple Service.\nPlease wait...",
-						true, true);
+				Toast.makeText(getApplicationContext(), "Finding Simple Service.\nPlease wait...", Toast.LENGTH_LONG)
+						.show();
 				break;
 			case MESSAGE_STOP_PROGRESS_DIALOG:
-				mDialog.dismiss();
+				Toast.makeText(getApplicationContext(), "Found Simple Service Successfully!", Toast.LENGTH_LONG).show();
 				break;
 			default:
 				break;
 			}
 		}
-	};
-	// Used to receive messages from the Activity
-	final Messenger inMessenger = new Messenger(mIncomingHandler);
-	// Use to send message to the Activity
-	private Messenger outMessenger;
+	});
 
 	@Override
 	public IBinder onBind(Intent intent) {
 		Bundle extras = intent.getExtras();
 		// Get messager from the Activity
 		if (extras != null) {
-			outMessenger = (Messenger) extras.get("MESSENGER");
+			mOutgoingMessenger = (Messenger) extras.get("MESSENGER");
 		}
 		// Return our messenger to the Activity to get commands
-		return inMessenger.getBinder();
+		return mIncomingMessenger.getBinder();
+	}
+
+	@Override
+	public void onRebind(Intent intent) {
+		Bundle extras = intent.getExtras();
+		// Get messager from the Activity
+		if (extras != null) {
+			mOutgoingMessenger = (Messenger) extras.get("MESSENGER");
+		}
+		super.onRebind(intent);
+	}
+
+	@Override
+	public boolean onUnbind(Intent intent) {
+		mOutgoingMessenger = null;
+		return super.onUnbind(intent);
 	}
 
 	@Override
@@ -136,13 +133,13 @@ public class PeerClientService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.v(TAG, "Peer Server service -- onStartCommand()");
-		startService();
+		getAlljoynBusHandler();
 		// We want this service to continue running until it is explicitly
 		// stopped, so return sticky.
 		return START_STICKY;
 	}
 
-	private void startService() {
+	private AlljoynBusHandler getAlljoynBusHandler() {
 		if (mBusHandler == null) {
 			/*
 			 * Make all AllJoyn calls through a separate handler thread to
@@ -150,27 +147,36 @@ public class PeerClientService extends Service {
 			 */
 			HandlerThread busThread = new HandlerThread("BusHandler");
 			busThread.start();
-			mBusHandler = new BusHandler(busThread.getLooper());
+			mBusHandler = new AlljoynBusHandler(busThread.getLooper());
 
 			/* Connect to an AllJoyn object. */
-			mBusHandler.sendEmptyMessage(BusHandler.CONNECT);
-			mIncomingHandler.sendEmptyMessage(MESSAGE_START_PROGRESS_DIALOG);
+			mBusHandler.sendEmptyMessage(AlljoynBusHandler.CONNECT);
+
+			try {
+				Message message = Message.obtain(null, MESSAGE_START_PROGRESS_DIALOG);
+				mIncomingMessenger.send(message);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+
 			Intent i = new Intent(this, PeerServerService.class);
 			this.startService(i);
 		}
+		return mBusHandler;
 	}
 
 	@Override
 	public void onDestroy() {
-		/* Disconnect to prevent resource leaks. */
-		mBusHandler.sendEmptyMessage(BusHandler.DISCONNECT);
-		mBusHandler = null;
 		super.onDestroy();
+		/* Disconnect to prevent resource leaks. */
+		// getBusHandler().sendEmptyMessage(BusHandler.DISCONNECT);
+		// mBusHandler = null;
+		Toast.makeText(getApplicationContext(), "PeerClientService onDestroy()...", Toast.LENGTH_LONG).show();
 
 	}
 
 	/* This class will handle all AllJoyn calls. See onCreate(). */
-	class BusHandler extends Handler {
+	class AlljoynBusHandler extends Handler {
 		/*
 		 * Name used as the well-known name and the advertised name of the
 		 * service this client is interested in. This name must be a unique name
@@ -182,7 +188,7 @@ public class PeerClientService extends Service {
 		private static final String SERVICE_NAME = "org.alljoyn.bus.samples.simple";
 		private static final short CONTACT_PORT = 42;
 
-		private BusAttachment mBus;
+		private BusAttachment mBus = null;
 		private ProxyBusObject mProxyObj;
 		private SimpleInterface mSimpleInterface;
 
@@ -190,6 +196,7 @@ public class PeerClientService extends Service {
 		private boolean mIsInASession;
 		private boolean mIsConnected;
 		private boolean mIsStoppingDiscovery;
+		private boolean foundAdvertisedName;
 
 		/* These are the messages sent to the BusHandler from the UI. */
 		public static final int CONNECT = 1;
@@ -197,7 +204,7 @@ public class PeerClientService extends Service {
 		public static final int DISCONNECT = 3;
 		public static final int PING = 4;
 
-		public BusHandler(Looper looper) {
+		public AlljoynBusHandler(Looper looper) {
 			super(looper);
 
 			mIsInASession = false;
@@ -213,68 +220,97 @@ public class PeerClientService extends Service {
 			 * SimpleInterface.
 			 */
 			case CONNECT: {
-				/*
-				 * All communication through AllJoyn begins with a
-				 * BusAttachment.
-				 * 
-				 * A BusAttachment needs a name. The actual name is unimportant
-				 * except for internal security. As a default we use the class
-				 * name as the name.
-				 * 
-				 * By default AllJoyn does not allow communication between
-				 * devices (i.e. bus to bus communication). The second argument
-				 * must be set to Receive to allow communication between
-				 * devices.
-				 */
-				mBus = new BusAttachment(getPackageName(), BusAttachment.RemoteMessage.Receive);
+				if (mBus == null) {
+					/*
+					 * All communication through AllJoyn begins with a
+					 * BusAttachment.
+					 * 
+					 * A BusAttachment needs a name. The actual name is
+					 * unimportant except for internal security. As a default we
+					 * use the class name as the name.
+					 * 
+					 * By default AllJoyn does not allow communication between
+					 * devices (i.e. bus to bus communication). The second
+					 * argument must be set to Receive to allow communication
+					 * between devices.
+					 */
+					mBus = new BusAttachment(getPackageName(), BusAttachment.RemoteMessage.Receive);
 
-				/*
-				 * Create a bus listener class
-				 */
-				mBus.registerBusListener(new BusListener() {
-					@Override
-					public void foundAdvertisedName(String name, short transport, String namePrefix) {
-						logInfo(String.format("MyBusListener.foundAdvertisedName(%s, 0x%04x, %s)", name, transport,
-								namePrefix));
+					/*
+					 * Create a bus listener class
+					 */
+					mBus.registerBusListener(new BusListener() {
+
+						@Override
+						public void foundAdvertisedName(String name, short transport, String namePrefix) {
+							logInfo(String.format("PeerClientService.foundAdvertisedName(%s, 0x%04x, %s)", name,
+									transport, namePrefix));
+							/*
+							 * This client will only join the first service that
+							 * it sees advertising the indicated well-known
+							 * name. If the program is already a member of a
+							 * session (i.e. connected to a service) we will not
+							 * attempt to join another session. It is possible
+							 * to join multiple session however joining multiple
+							 * sessions is not shown in this sample.
+							 */
+							if (!mIsConnected) {
+								Message msg = obtainMessage(JOIN_SESSION, name);
+								sendMessage(msg);
+							}
+							foundAdvertisedName = true;
+						}
+
+						@Override
+						public void busStopping() {
+							logInfo("PeerClientService.busStopping...");
+							foundAdvertisedName = false;
+							super.busStopping();
+						}
+
+						@Override
+						public void lostAdvertisedName(String name, short transport, String namePrefix) {
+							logInfo("PeerClientService.lostAdvertisedName name=" + name + " transport=" + transport
+									+ " namePrefix=" + namePrefix);
+							foundAdvertisedName = false;
+							super.lostAdvertisedName(name, transport, namePrefix);
+						}
+
+						@Override
+						public void nameOwnerChanged(String busName, String previousOwner, String newOwner) {
+							logInfo("PeerClientService.nameOwnerChanged busName=" + busName + " previousOwner=" + previousOwner
+									+ " newOwner=" + newOwner);
+							super.nameOwnerChanged(busName, previousOwner, newOwner);
+						}
+
+					});
+
+
+					if (!foundAdvertisedName) {
 						/*
-						 * This client will only join the first service that it
-						 * sees advertising the indicated well-known name. If
-						 * the program is already a member of a session (i.e.
-						 * connected to a service) we will not attempt to join
-						 * another session. It is possible to join multiple
-						 * session however joining multiple sessions is not
-						 * shown in this sample.
+						 * To communicate with AllJoyn objects, we must connect the
+						 * BusAttachment to the bus.
 						 */
-						if (!mIsConnected) {
-							Message msg = obtainMessage(JOIN_SESSION, name);
-							sendMessage(msg);
+						Status status = mBus.connect();
+						logStatus("BusAttachment.connect()", status);
+						if (Status.OK != status) {
+							return;
+						}
+						/*
+						 * Now find an instance of the AllJoyn object we want to
+						 * call. We start by looking for a name, then connecting
+						 * to the device that is advertising that name.
+						 * 
+						 * In this case, we are looking for the well-known
+						 * SERVICE_NAME.
+						 */
+						status = mBus.findAdvertisedName(SERVICE_NAME);
+						logStatus(String.format("BusAttachement.findAdvertisedName(%s)", SERVICE_NAME), status);
+						if (Status.OK != status) {
+							return;
 						}
 					}
-				});
-
-				/*
-				 * To communicate with AllJoyn objects, we must connect the
-				 * BusAttachment to the bus.
-				 */
-				Status status = mBus.connect();
-				logStatus("BusAttachment.connect()", status);
-				if (Status.OK != status) {
-					return;
 				}
-
-				/*
-				 * Now find an instance of the AllJoyn object we want to call.
-				 * We start by looking for a name, then connecting to the device
-				 * that is advertising that name.
-				 * 
-				 * In this case, we are looking for the well-known SERVICE_NAME.
-				 */
-				status = mBus.findAdvertisedName(SERVICE_NAME);
-				logStatus(String.format("BusAttachement.findAdvertisedName(%s)", SERVICE_NAME), status);
-				if (Status.OK != status) {
-					return;
-				}
-
 				break;
 			}
 			case (JOIN_SESSION): {
@@ -303,20 +339,26 @@ public class PeerClientService extends Service {
 					@Override
 					public void sessionLost(int sessionId) {
 						mIsConnected = false;
-						logInfo(String.format("MyBusListener.sessionLost(%d)", sessionId));
-						mIncomingHandler.sendEmptyMessage(MESSAGE_START_PROGRESS_DIALOG);
+						logInfo(String.format("PeerClientService.sessionLost(%d)", sessionId));
+						try {
+							Message message = Message.obtain(null, MESSAGE_START_PROGRESS_DIALOG);
+							mIncomingMessenger.send(message);
+						} catch (RemoteException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 
 					@Override
 					public void sessionMemberAdded(int sessionId, String uniqueName) {
-						logInfo(String.format("MyBusListener.sessionMemberAdded(sessionId=%d uniqueName=%s)",
+						logInfo(String.format("PeerClientService.sessionMemberAdded(sessionId=%d uniqueName=%s)",
 								sessionId, uniqueName));
 						super.sessionMemberAdded(sessionId, uniqueName);
 					}
 
 					@Override
 					public void sessionMemberRemoved(int sessionId, String uniqueName) {
-						logInfo(String.format("MyBusListener.sessionMemberRemoved(sessionId=%d uniqueName=%s)",
+						logInfo(String.format("PeerClientService.sessionMemberRemoved(sessionId=%d uniqueName=%s)",
 								sessionId, uniqueName));
 						super.sessionMemberRemoved(sessionId, uniqueName);
 					}
@@ -325,7 +367,7 @@ public class PeerClientService extends Service {
 
 					@Override
 					public void onJoinSession(Status status, int sessionId, SessionOpts sessionOpts, Object userContext) {
-						logInfo(String.format("MyBusListener.onJoinSession(sessionId=%d status=%s)", sessionId,
+						logInfo(String.format("PeerClientService.onJoinSession(sessionId=%d status=%s)", sessionId,
 								status.name()));
 						super.onJoinSession(status, sessionId, sessionOpts, userContext);
 					}
@@ -354,7 +396,13 @@ public class PeerClientService extends Service {
 
 					mSessionId = sessionId.value;
 					mIsConnected = true;
-					mIncomingHandler.sendEmptyMessage(MESSAGE_STOP_PROGRESS_DIALOG);
+					try {
+						Message message = Message.obtain(null, MESSAGE_STOP_PROGRESS_DIALOG);
+						mIncomingMessenger.send(message);
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 				break;
 			}
@@ -366,8 +414,10 @@ public class PeerClientService extends Service {
 					Status status = mBus.leaveSession(mSessionId);
 					logStatus("BusAttachment.leaveSession()", status);
 				}
+				logInfo("PeerClientService DISCONNECT....");
 				mBus.disconnect();
 				getLooper().quit();
+				mBus = null;
 				break;
 			}
 
@@ -381,9 +431,20 @@ public class PeerClientService extends Service {
 			case PING: {
 				try {
 					if (mSimpleInterface != null) {
-						sendUiMessage(MESSAGE_PING, msg.obj);
 						String reply = mSimpleInterface.Ping((String) msg.obj);
-						sendUiMessage(MESSAGE_PING_REPLY, reply);
+
+						Message backMsg = Message.obtain();
+						backMsg.arg1 = Activity.RESULT_OK;
+						Bundle bundle = new Bundle();
+						bundle.putString(RESULTPATH, "PeerClientService Pong:" + reply);
+						backMsg.setData(bundle);
+
+						try {
+							mOutgoingMessenger.send(backMsg);
+						} catch (android.os.RemoteException e1) {
+							Log.w(getClass().getName(), "Exception sending message", e1);
+						}
+
 					}
 				} catch (BusException ex) {
 					logException("SimpleInterface.Ping()", ex);
@@ -394,11 +455,6 @@ public class PeerClientService extends Service {
 				break;
 			}
 		}
-
-		/* Helper function to send a message to the UI thread. */
-		private void sendUiMessage(int what, Object obj) {
-			mIncomingHandler.sendMessage(mIncomingHandler.obtainMessage(what, obj));
-		}
 	}
 
 	private void logStatus(String msg, Status status) {
@@ -406,16 +462,12 @@ public class PeerClientService extends Service {
 		if (status == Status.OK) {
 			Log.i(TAG, log);
 		} else {
-			Message toastMsg = mIncomingHandler.obtainMessage(MESSAGE_POST_TOAST, log);
-			mIncomingHandler.sendMessage(toastMsg);
 			Log.e(TAG, log);
 		}
 	}
 
 	private void logException(String msg, BusException ex) {
 		String log = String.format("%s: %s", msg, ex);
-		Message toastMsg = mIncomingHandler.obtainMessage(MESSAGE_POST_TOAST, log);
-		mIncomingHandler.sendMessage(toastMsg);
 		Log.e(TAG, log, ex);
 	}
 

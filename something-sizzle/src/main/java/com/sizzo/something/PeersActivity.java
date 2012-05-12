@@ -12,8 +12,6 @@ import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.SupplicantState;
@@ -21,6 +19,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,8 +42,7 @@ public class PeersActivity extends Activity {
 	OptionsMenu optionsMenu;
 	private BroadcastReceiver wifiStateReceiver;
 	private WifiManager wifiManager;
-	WifiConnect wifiConnect;
-	List<Map<String, Object>> wifiConfigurationAdapts = new ArrayList<Map<String, Object>>();
+	List<Map<String, Object>> listDataAdapts = new ArrayList<Map<String, Object>>();
 	MyArrayAdapter<Map<String, Object>> adapter;
 	Map<String, Object> currentWifiInfoMap = new HashMap<String, Object>();
 
@@ -57,7 +55,7 @@ public class PeersActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.peers);
 		adapter = new MyArrayAdapter<Map<String, Object>>(this, R.layout.peersitem, R.id.listitem_content,
-				wifiConfigurationAdapts);
+				listDataAdapts);
 		((ListView) findViewById(R.id.peerListView)).setAdapter(adapter);
 		this.initListView();
 		OpenWifi();
@@ -155,54 +153,61 @@ public class PeersActivity extends Activity {
 		((ListView) findViewById(R.id.peerListView)).setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-				if (wifiConfigurationAdapts != null && wifiConfigurationAdapts.get(position) != null) {
-					Map map = wifiConfigurationAdapts.get(position);
+				if (listDataAdapts != null && listDataAdapts.get(position) != null) {
+					Map map = listDataAdapts.get(position);
 					ItemType type = (ItemType) map.get("TYPE");
 					switch (type) {
 					case ME:
-						handleMeItem(activity, wifiConfigurationAdapts, position);
+						handleMeItem(activity, listDataAdapts, position);
 						break;
 					case WIFI:
-						handleWifiItem(activity, wifiConfigurationAdapts, position);
+						handleWifiItem(activity, listDataAdapts, position);
 						break;
 					case PEER:
-						handlePeerItem(activity, wifiConfigurationAdapts, position);
+						handlePeerItem(activity, listDataAdapts, position);
 						break;
 					default:
-						handleDefaultItem(activity, wifiConfigurationAdapts, position);
+						handleDefaultItem(activity, listDataAdapts, position);
 						break;
 					}
 				}
 			}
 
-			private void handleMeItem(final Activity activity, final List<Map<String, Object>> wifiConfigurationAdapts,
+			private void handleMeItem(final Activity activity, final List<Map<String, Object>> listDataAdapts,
 					final int position) {
 
 				Intent i = new Intent(activity, MyRolesActivity.class);
 				i.putExtra("url", "http://m.hao123.com?q=" + currentWifiInfoMap.get("SSID"));
 				activity.startActivity(i);
-				Map map = wifiConfigurationAdapts.get(position);
+				Map map = listDataAdapts.get(position);
 				map.put("DETAIL", "Change my role.....");
 				adapter.notifyDataSetChanged();
 			}
 
-			private void handleWifiItem(final Activity activity,
-					final List<Map<String, Object>> wifiConfigurationAdapts, final int position) {
+			private void handleWifiItem(final Activity activity, final List<Map<String, Object>> listDataAdapts,
+					final int position) {
 				if (currentWifiInfoMap != null) {
+					WifiInfo wifiInfo = (WifiInfo) currentWifiInfoMap.get("object");
 					Intent i = new Intent(activity, BrowserActivity.class);
-					i.putExtra("url", "http://m.hao123.com?q=" + currentWifiInfoMap.get("SSID"));
+					String ip = intToIp(wifiInfo.getIpAddress());
+					i.putExtra("url", "http://" + ip);
 					activity.startActivity(i);
+					Log.i(TAG,ip);
 				}
 			}
 
-			private void handlePeerItem(final Activity activity,
-					final List<Map<String, Object>> wifiConfigurationAdapts, final int position) {
+			public String intToIp(int i) {
+				return  (i & 0xFF)+ "." + ((i >> 8) & 0xFF) + "." + ((i >> 16) & 0xFF) + "." + ((i >> 24) & 0xFF);
+			}
+
+			private void handlePeerItem(final Activity activity, final List<Map<String, Object>> listDataAdapts,
+					final int position) {
 				Intent i = new Intent(activity, PeerChatActivity.class);
 				activity.startActivity(i);
 			}
 
-			private void handleDefaultItem(final Activity activity,
-					final List<Map<String, Object>> wifiConfigurationAdapts, final int position) {
+			private void handleDefaultItem(final Activity activity, final List<Map<String, Object>> listDataAdapts,
+					final int position) {
 				new AlertDialog.Builder(activity).setTitle("Dialog for default item").show();
 			}
 
@@ -216,9 +221,10 @@ public class PeersActivity extends Activity {
 			map = new HashMap<String, Object>();
 			map.put("PIC", R.drawable.pic);
 			map.put("TITLE", "Lulu 00" + i);
-			map.put("DETAIL", "主页：http://www.lulu00" + i + ".com.cn 简介简介简介简介简介简介简介简介简介简介简介简介简介简介简介简介简介简介简介介简介简介简介简介简介简介简介简介简介简介简介简介简介简介");
+			map.put("DETAIL", "主页：http://www.lulu00" + i
+					+ ".com.cn 简介简介简介简介简介简介简介简介简介简介简介简介简介简介简介简介简介简介简介介简介简介简介简介简介简介简介简介简介简介简介简介简介简介");
 			map.put("TYPE", ItemType.PEER);
-			wifiConfigurationAdapts.add(map);
+			listDataAdapts.add(map);
 			adapter.notifyDataSetChanged();
 		}
 	}
@@ -230,13 +236,13 @@ public class PeersActivity extends Activity {
 		map.put("TITLE", "#5桌 Conan Chen");
 		map.put("DETAIL", "主页：http://www.conanchen.com.cn");
 		map.put("TYPE", ItemType.ME);
-		wifiConfigurationAdapts.add(map);
+		listDataAdapts.add(map);
 		adapter.notifyDataSetChanged();
 	}
 
 	private void initCurrentWifiInfo() {
 		currentWifiInfoMap.put("TYPE", ItemType.WIFI);
-		wifiConfigurationAdapts.add(currentWifiInfoMap);
+		listDataAdapts.add(currentWifiInfoMap);
 		updateCurrentWifiInfo();
 	}
 
@@ -244,9 +250,10 @@ public class PeersActivity extends Activity {
 		WifiInfo currentWifiConnection = getWifiManager().getConnectionInfo();
 		if (currentWifiConnection != null) {
 			currentWifiInfoMap.put("PIC", R.drawable.pic);
-			currentWifiInfoMap.put("TITLE", currentWifiConnection.getBSSID());
-			currentWifiInfoMap.put("DETAIL",
-					"Elevent香港茶餐廳主页：http://www.conanchen.com.cn" + currentWifiConnection.toString());
+			currentWifiInfoMap.put("TITLE", currentWifiConnection.getSSID());
+			currentWifiInfoMap.put("DETAIL", currentWifiConnection.getBSSID() + currentWifiConnection.getIpAddress()
+					+ "Elevent香港茶餐廳主页：http://www.conanchen.com.cn" + currentWifiConnection.toString());
+			currentWifiInfoMap.put("object", currentWifiConnection);
 		}
 		// current wifi info
 		adapter.notifyDataSetChanged();
