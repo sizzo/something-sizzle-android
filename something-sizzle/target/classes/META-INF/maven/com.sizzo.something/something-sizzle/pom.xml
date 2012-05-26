@@ -19,6 +19,19 @@
           <name>Releases</name>
           <url>https://oss.sonatype.org/content/repositories/releases</url>
       </repository>
+      <repository>
+      <id>central</id>
+      <name>Maven Repository Switchboard</name>
+      <layout>default</layout>
+      <url>http://repo1.maven.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>Spark repository</id>
+      <url>http://www.sparkjava.com/nexus/content/repositories/spark/</url>
+</repository>
   </repositories>
   
   <dependencies>
@@ -40,6 +53,36 @@
         <artifactId>jmdns</artifactId>
         <version>3.4.1</version>
       </dependency>
+      
+
+	<dependency>
+		<groupId>org.eclipse.jetty</groupId>
+		<artifactId>jetty-server</artifactId>
+		<version>8.1.0.RC4</version>
+	</dependency>
+            
+	<dependency>
+		<groupId>org.eclipse.jetty</groupId>
+		<artifactId>jetty-client</artifactId>
+		<version>8.1.0.RC4</version>
+	</dependency>
+	<dependency>
+		<groupId>org.eclipse.jetty</groupId>
+		<artifactId>jetty-security</artifactId>
+		<version>8.1.0.RC4</version>
+	</dependency>
+	<dependency>
+		<groupId>org.eclipse.jetty</groupId>
+		<artifactId>jetty-deploy</artifactId>
+		<version>8.1.0.RC4</version>
+	</dependency>
+	
+<dependency>
+      <groupId>spark</groupId>
+      <artifactId>spark</artifactId>
+      <version>0.9.9.3-SNAPSHOT</version>
+</dependency>
+	
   </dependencies>
 
   <build>

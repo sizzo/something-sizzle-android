@@ -1,0 +1,10 @@
+com.sizzo.something
+com.sizzo.something.data
+com.sizzo.something.menu
+com.sizzo.something.service
+spark
+spark.examples.books
+spark.route
+spark.servlet
+spark.utils
+spark.webserver

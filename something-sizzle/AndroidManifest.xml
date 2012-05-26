@@ -26,35 +26,46 @@
     </uses-permission>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" >
     </uses-permission>
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
+        android:name=".SizzoApplication"
         android:icon="@drawable/icon"
         android:label="@string/app_name" >
-        <activity android:name=".PeersActivity" >
+        <activity
+            android:name=".IJetty"
+            android:icon="@drawable/icon"
+            android:label="@string/app_name"
+            android:launchMode="singleInstance"
+            android:multiprocess="false"
+            android:screenOrientation="sensor"
+            android:theme="@style/Theme.IJetty" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".PeerChatActivity"
-            android:label="@string/peerChatTitle" >
-        </activity>
-        <activity
-            android:name=".MyRolesActivity"
-            android:label="@string/myRolesTitle" >
-        </activity>
+        <!--
+        <activity android:name=".PeersActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>        -->
+        
         <activity
             android:name=".BrowserActivity"
             android:label="@string/browserTitle" >
         </activity>
-        
+
         <receiver android:name=".service.ScheduleReceiver" >
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-
-                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
             </intent-filter>
         </receiver>
         <receiver android:name=".service.StartServiceReceiver" >
@@ -66,29 +77,25 @@
             android:label="@string/discoverservice"
             android:process=":discoverservvice" >
         </service>
-        <service
-            android:name=".service.alljoyn.PeerClientService"
-            android:icon="@drawable/icon"
-            android:label="@string/peerclientservice"
-            android:process=":peerclientservice" >
-        </service>
-        <service
-            android:name=".service.alljoyn.PeerServerService"
-            android:icon="@drawable/icon"
-            android:label="@string/peerserverservice"
-            android:process=":peerserverservice" >
-        </service>
-        <service
-            android:name="org.alljoyn.bus.alljoyn.BundleDaemonService"
-            android:icon="@drawable/icon"
-            android:label="@string/alljoyndaemonservice"
-            android:process=".alljoyndaemonservice" >
-        </service>
+        <service android:name=".service.IJettyService" />
+
         <provider
             android:name=".data.SizzoProvider"
             android:authorities="com.sizzo.data"
             android:multiprocess="true" >
         </provider>
+
+        <activity
+            android:name=".IJettyEditor"
+            android:theme="@style/Theme.IJetty" />
+        <activity
+            android:name=".IJettyDownloader"
+            android:theme="@style/Theme.IJetty" />
+        <activity
+            android:name=".SdCardUnavailableActivity"
+            android:theme="@style/Theme.IJetty" />
+
+        <service android:name=".IJettyService" />
     </application>
 
 </manifest>

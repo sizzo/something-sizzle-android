@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/peers"
+        android:showAsAction="always"
+        android:title="@string/peersOption">
+    </item>
+    <item
+        android:id="@+id/history"
+        android:showAsAction="always"
+        android:title="@string/historyOption">
+    </item>
+    <item
+        android:id="@+id/settings"
+        android:showAsAction="ifRoom"
+        android:title="Settings">
+    </item>
+
+</menu>

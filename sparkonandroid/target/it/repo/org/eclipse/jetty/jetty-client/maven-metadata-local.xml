@@ -1,0 +1,10 @@
+<metadata>
+  <groupId>org.eclipse.jetty</groupId>
+  <artifactId>jetty-client</artifactId>
+  <versioning>
+    <versions>
+      <version>8.1.0.RC4</version>
+    </versions>
+    <lastUpdated>20120526044745</lastUpdated>
+  </versioning>
+</metadata>

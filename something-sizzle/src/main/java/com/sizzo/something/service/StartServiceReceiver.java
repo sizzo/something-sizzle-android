@@ -3,22 +3,17 @@ package com.sizzo.something.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
-import com.sizzo.something.service.alljoyn.PeerClientService;
-import com.sizzo.something.service.alljoyn.PeerServerService;
 import com.sizzo.something.service.jmdns.DiscoverService;
 
 public class StartServiceReceiver extends BroadcastReceiver {
+	private static final String TAG = "StartServiceReceiver";
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		Log.i(TAG, "StartServiceReceiver.onReceive().....");
 		Intent service = new Intent(context, DiscoverService.class);
 		context.startService(service);
-		
-		Intent peerServer = new Intent(context, PeerServerService.class);
-		context.startService(peerServer); 
-
-		Intent peerClient = new Intent(context, PeerClientService.class);
-		context.startService(peerClient); 
 	}
 }
