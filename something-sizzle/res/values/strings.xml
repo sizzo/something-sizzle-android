@@ -18,7 +18,7 @@
      <string name="alljoyndaemonservice">Alljoyn Daemon</string>
      <string name="peerserverservice">Peer Server</string>
      <string name="discoverservice">Discover Server</string>
-     <string name="peerclientservice">Client Service</string>
+     <string name="peerservice">Peer Service</string>
     
     
     <string name="jetty_started">Jetty started</string>

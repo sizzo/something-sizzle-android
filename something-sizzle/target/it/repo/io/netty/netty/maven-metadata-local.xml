@@ -1,0 +1,10 @@
+<metadata>
+  <groupId>io.netty</groupId>
+  <artifactId>netty</artifactId>
+  <versioning>
+    <versions>
+      <version>3.4.6.Final</version>
+    </versions>
+    <lastUpdated>20120531145345</lastUpdated>
+  </versioning>
+</metadata>

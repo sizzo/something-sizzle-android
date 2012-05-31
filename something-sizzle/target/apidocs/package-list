@@ -3,9 +3,5 @@ com.sizzo.something.data
 com.sizzo.something.menu
 com.sizzo.something.service
 com.sizzo.something.service.jmdns
-org.mortbay.ijetty
-org.mortbay.ijetty.deployer
-org.mortbay.ijetty.handler
-org.mortbay.ijetty.log
-org.mortbay.ijetty.util
-org.mortbay.ijetty.webapp
+com.sizzo.something.service.p2p
+org.slf4j

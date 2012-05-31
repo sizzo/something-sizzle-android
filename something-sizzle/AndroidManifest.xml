@@ -35,28 +35,13 @@
         android:name=".SizzoApplication"
         android:icon="@drawable/icon"
         android:label="@string/app_name" >
-        <activity
-            android:name=".IJetty"
-            android:icon="@drawable/icon"
-            android:label="@string/app_name"
-            android:launchMode="singleInstance"
-            android:multiprocess="false"
-            android:screenOrientation="sensor"
-            android:theme="@style/Theme.IJetty" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <!--
         <activity android:name=".PeersActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>        -->
+        </activity>
         
         <activity
             android:name=".BrowserActivity"
@@ -75,9 +60,8 @@
             android:name=".service.jmdns.DiscoverService"
             android:icon="@drawable/icon"
             android:label="@string/discoverservice"
-            android:process=":discoverservvice" >
-        </service>
-        <service android:name=".service.IJettyService" />
+            android:process=":discoverservvice" 
+            />
 
         <provider
             android:name=".data.SizzoProvider"
@@ -86,16 +70,14 @@
         </provider>
 
         <activity
-            android:name=".IJettyEditor"
-            android:theme="@style/Theme.IJetty" />
-        <activity
-            android:name=".IJettyDownloader"
-            android:theme="@style/Theme.IJetty" />
-        <activity
-            android:name=".SdCardUnavailableActivity"
+            android:name=".SdCardAvailableActivity"
             android:theme="@style/Theme.IJetty" />
 
-        <service android:name=".IJettyService" />
+        <service android:name=".service.p2p.PeerServerService"
+            android:icon="@drawable/icon"
+            android:label="@string/peerservice"
+            android:process=":peerservvice" 
+             />
     </application>
 
 </manifest>

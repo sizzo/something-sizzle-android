@@ -7,9 +7,17 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,8 +28,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sizzo.something.menu.OptionsMenu;
+import com.sizzo.something.service.p2p.PeerServerService;
 
 public class PeersActivity extends Activity {
 	private static String TAG = "PeersActivity";
@@ -41,6 +51,14 @@ public class PeersActivity extends Activity {
 				listDataAdapts);
 		((ListView) findViewById(R.id.peerListView)).setAdapter(adapter);
 		this.initListView();
+		
+		startPeer();
+	}
+
+	private void startPeer() {
+		Intent i = new Intent(this, PeerServerService.class);
+		i.putExtra("peerId", "test.android."+Build.MANUFACTURER );
+		this.startService(i);
 	}
 
 	@Override
@@ -98,9 +116,11 @@ public class PeersActivity extends Activity {
 
 			private void handlePeerItem(final Activity activity, final List<Map<String, Object>> listDataAdapts,
 					final int position) {
-				Intent i = new Intent(activity, BrowserActivity.class);
-				i.putExtra("url", "http://m.hao123.com?q=" );
-				activity.startActivityIfNeeded(i,Intent.FLAG_ACTIVITY_NEW_TASK);
+//				Intent i = new Intent(activity, BrowserActivity.class);
+//				i.putExtra("url", "http://m.hao123.com?q=" );
+//				activity.startActivityIfNeeded(i,Intent.FLAG_ACTIVITY_NEW_TASK);
+				
+				findPeers();
 			}
 
 			private void handleDefaultItem(final Activity activity, final List<Map<String, Object>> listDataAdapts,
@@ -149,5 +169,69 @@ public class PeersActivity extends Activity {
 		}
 	}
 
+	
+	//--------------IPC call PeerServerService----------------------
+	Messenger messenger = null;
+
+	private Handler handler = new Handler() {
+		public void handleMessage(Message message) {
+			Bundle data = message.getData();
+			if (message.arg1 == RESULT_OK && data != null) {
+				String text = data
+						.getString("RESULTPATH");
+				Toast.makeText(PeersActivity.this, text, Toast.LENGTH_LONG)
+						.show();
+			}
+		}
+	};
+
+
+
+	private ServiceConnection conn = new ServiceConnection() {
+
+		public void onServiceConnected(ComponentName className, IBinder binder) {
+			messenger = new Messenger(binder);
+
+		}
+
+		public void onServiceDisconnected(ComponentName className) {
+			messenger = null;
+		}
+	};
+
+	protected void onResume() {
+		super.onResume();
+		Toast.makeText(this, "OnResume called", Toast.LENGTH_SHORT).show();
+		Intent intent = null;
+		intent = new Intent(this, PeerServerService.class);
+		// Create a new Messenger for the communication back
+		// From the Service to the Activity
+		Messenger messenger = new Messenger(handler);
+		intent.putExtra("MESSENGER", messenger);
+
+		bindService(intent, conn, Context.BIND_AUTO_CREATE);
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		unbindService(conn);
+	}	
+	
+	public void findPeers() {
+		Message msg = Message.obtain();
+
+		try {
+			Bundle bundle = new Bundle();
+			bundle.putString("FILENAME", "index.html");
+			bundle.putString("URLPATH",
+					"http://www.vogella.com/index.html");
+			msg.setData(bundle);
+			messenger.send(msg);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
+	//--------------/IPC call PeerServerService----------------------
 
 }

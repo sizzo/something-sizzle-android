@@ -1,0 +1,11 @@
+<metadata>
+  <groupId>org.sonatype.oss</groupId>
+  <artifactId>oss-parent</artifactId>
+  <versioning>
+    <versions>
+      <version>5</version>
+      <version>7</version>
+    </versions>
+    <lastUpdated>20120531145346</lastUpdated>
+  </versioning>
+</metadata>

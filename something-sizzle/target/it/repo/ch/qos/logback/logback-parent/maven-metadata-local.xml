@@ -1,0 +1,10 @@
+<metadata>
+  <groupId>ch.qos.logback</groupId>
+  <artifactId>logback-parent</artifactId>
+  <versioning>
+    <versions>
+      <version>1.0.3</version>
+    </versions>
+    <lastUpdated>20120531134826</lastUpdated>
+  </versioning>
+</metadata>

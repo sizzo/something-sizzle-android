@@ -117,9 +117,9 @@ public final class R {
         public static final int non_ssl_category=0x7f070024;
         public static final int overwrite=0x7f070058;
         public static final int peerChatTitle=0x7f07000a;
-        public static final int peerclientservice=0x7f07000f;
         public static final int peersOption=0x7f070004;
         public static final int peerserverservice=0x7f07000d;
+        public static final int peerservice=0x7f07000f;
         public static final int pref_console_pwd=0x7f07004c;
         public static final int pref_console_pwd_key=0x7f07004e;
         public static final int pref_console_pwd_title=0x7f07004d;

@@ -13,26 +13,6 @@
   <packaging>apk</packaging>
   <name>something-sizzle - Application</name>
 
-  <repositories>
-      <repository>
-          <id>releases</id>
-          <name>Releases</name>
-          <url>https://oss.sonatype.org/content/repositories/releases</url>
-      </repository>
-      <repository>
-      <id>central</id>
-      <name>Maven Repository Switchboard</name>
-      <layout>default</layout>
-      <url>http://repo1.maven.org/maven2</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>Spark repository</id>
-      <url>http://www.sparkjava.com/nexus/content/repositories/spark/</url>
-</repository>
-  </repositories>
   
   <dependencies>
 	<dependency>
@@ -44,46 +24,48 @@
 		<artifactId>google-collections</artifactId>
 		<version>1.0</version>
 	</dependency>
-    <dependency>
-      <groupId>de.akquinet.android.androlog</groupId>
-      <artifactId>androlog</artifactId>
-    </dependency>
+
     <dependency>
         <groupId>javax.jmdns</groupId>
         <artifactId>jmdns</artifactId>
         <version>3.4.1</version>
       </dependency>
       
+	<dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty</artifactId>
+        <version>3.4.6.Final</version>
+    </dependency>
+    <!-- 
+	<dependency>
+		<groupId>org.slf4j</groupId>
+		<artifactId>slf4j-api</artifactId>
+		<version>1.6.4</version>
+	</dependency>
+    <dependency>
+		<groupId>ch.qos.logback</groupId>
+		<artifactId>logback-core</artifactId>
+		<version>1.0.3</version>
+	</dependency>
+	      -->
+	             
+	<dependency>
+	    <groupId>jdbm</groupId>
+	    <artifactId>jdbm</artifactId>
+	    <version>3.0-SNAPSHOT</version>
+	    <scope>system</scope>
+	    <systemPath>${project.basedir}/libs/jdbm-3.0-SNAPSHOT.jar</systemPath>
+	</dependency>
 
 	<dependency>
-		<groupId>org.eclipse.jetty</groupId>
-		<artifactId>jetty-server</artifactId>
-		<version>8.1.0.RC4</version>
-	</dependency>
-            
-	<dependency>
-		<groupId>org.eclipse.jetty</groupId>
-		<artifactId>jetty-client</artifactId>
-		<version>8.1.0.RC4</version>
-	</dependency>
-	<dependency>
-		<groupId>org.eclipse.jetty</groupId>
-		<artifactId>jetty-security</artifactId>
-		<version>8.1.0.RC4</version>
-	</dependency>
-	<dependency>
-		<groupId>org.eclipse.jetty</groupId>
-		<artifactId>jetty-deploy</artifactId>
-		<version>8.1.0.RC4</version>
-	</dependency>
-	
-<dependency>
-      <groupId>spark</groupId>
-      <artifactId>spark</artifactId>
-      <version>0.9.9.3-SNAPSHOT</version>
-</dependency>
-	
-  </dependencies>
+	    <groupId>TomP2P</groupId>
+	    <artifactId>TomP2P</artifactId>
+	    <version>4.1.2-preview</version>
+	    <scope>system</scope>
+	    <systemPath>${project.basedir}/libs/TomP2P-4.1.2-preview.jar</systemPath>
+	</dependency> 
+
+	</dependencies>
 
   <build>
     <plugins>
