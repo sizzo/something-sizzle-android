@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sizzo.something.menu.OptionsMenu;
+import com.sizzo.something.service.http.HttpServerService;
 import com.sizzo.something.service.p2p.PeerServerService;
 
 public class PeersActivity extends Activity {
@@ -51,13 +52,16 @@ public class PeersActivity extends Activity {
 				listDataAdapts);
 		((ListView) findViewById(R.id.peerListView)).setAdapter(adapter);
 		this.initListView();
-		
+
 		startPeer();
 	}
 
 	private void startPeer() {
 		Intent i = new Intent(this, PeerServerService.class);
-		i.putExtra("peerId", "test.android."+Build.MANUFACTURER );
+		i.putExtra("peerId", "test.android." + Build.MANUFACTURER);
+		this.startService(i);
+
+		i = new Intent(this, HttpServerService.class);
 		this.startService(i);
 	}
 
@@ -67,8 +71,6 @@ public class PeersActivity extends Activity {
 
 		return optionsMenu.createOptionsMenu();
 	}
-
-
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -82,18 +84,13 @@ public class PeersActivity extends Activity {
 		super.onRestoreInstanceState(savedInstanceState);
 	}
 
-
-
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 	}
 
-
 	private void initListView() {
 		final Activity activity = this;
-
-
 
 		initCurrentPeersInfo();
 
@@ -116,10 +113,10 @@ public class PeersActivity extends Activity {
 
 			private void handlePeerItem(final Activity activity, final List<Map<String, Object>> listDataAdapts,
 					final int position) {
-//				Intent i = new Intent(activity, BrowserActivity.class);
-//				i.putExtra("url", "http://m.hao123.com?q=" );
-//				activity.startActivityIfNeeded(i,Intent.FLAG_ACTIVITY_NEW_TASK);
-				
+				// Intent i = new Intent(activity, BrowserActivity.class);
+				// i.putExtra("url", "http://m.hao123.com?q=" );
+				// activity.startActivityIfNeeded(i,Intent.FLAG_ACTIVITY_NEW_TASK);
+
 				findPeers();
 			}
 
@@ -138,15 +135,15 @@ public class PeersActivity extends Activity {
 			map = new HashMap<String, Object>();
 			map.put("PIC", R.drawable.pic);
 			map.put("TITLE", "Lulu 00" + i);
-			map.put("DETAIL", "涓婚〉锛歨ttp://www.lulu00" + i
-					+ ".com.cn 绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠");
+			map.put("DETAIL",
+					"涓婚〉锛歨ttp://www.lulu00"
+							+ i
+							+ ".com.cn 绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙绠�粙浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠嬬畝浠");
 			map.put("TYPE", ItemType.PEER);
 			listDataAdapts.add(map);
 			adapter.notifyDataSetChanged();
 		}
 	}
-
-
 
 	private class MyArrayAdapter<T> extends ArrayAdapter<T> {
 
@@ -169,23 +166,18 @@ public class PeersActivity extends Activity {
 		}
 	}
 
-	
-	//--------------IPC call PeerServerService----------------------
+	// --------------IPC call PeerServerService----------------------
 	Messenger messenger = null;
 
 	private Handler handler = new Handler() {
 		public void handleMessage(Message message) {
 			Bundle data = message.getData();
 			if (message.arg1 == RESULT_OK && data != null) {
-				String text = data
-						.getString("RESULTPATH");
-				Toast.makeText(PeersActivity.this, text, Toast.LENGTH_LONG)
-						.show();
+				String text = data.getString("RESULTPATH");
+				Toast.makeText(PeersActivity.this, text, Toast.LENGTH_LONG).show();
 			}
 		}
 	};
-
-
 
 	private ServiceConnection conn = new ServiceConnection() {
 
@@ -216,22 +208,21 @@ public class PeersActivity extends Activity {
 	protected void onPause() {
 		super.onPause();
 		unbindService(conn);
-	}	
-	
+	}
+
 	public void findPeers() {
 		Message msg = Message.obtain();
 
 		try {
 			Bundle bundle = new Bundle();
 			bundle.putString("FILENAME", "index.html");
-			bundle.putString("URLPATH",
-					"http://www.vogella.com/index.html");
+			bundle.putString("URLPATH", "http://www.vogella.com/index.html");
 			msg.setData(bundle);
 			messenger.send(msg);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
 	}
-	//--------------/IPC call PeerServerService----------------------
+	// --------------/IPC call PeerServerService----------------------
 
 }

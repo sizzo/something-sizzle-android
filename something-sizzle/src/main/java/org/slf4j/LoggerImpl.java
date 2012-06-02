@@ -188,4 +188,10 @@ public class LoggerImpl implements Logger {
 
 	}
 
+	@Override
+	public void error(Exception e) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

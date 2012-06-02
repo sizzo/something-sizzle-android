@@ -78,6 +78,11 @@
             android:label="@string/peerservice"
             android:process=":peerservvice" 
              />
+        <service android:name=".service.http.HttpServerService"
+            android:icon="@drawable/icon"
+            android:label="@string/httpservice"
+            android:process=":httpservvice" 
+             />
     </application>
 
 </manifest>

@@ -351,9 +351,9 @@ public interface Logger {
   /**
    * Log a message at the ERROR level.
    *
-   * @param msg the message string to be logged
+   * @param e the message string to be logged
    */
-  public void error(String msg);
+  public void error(Exception e);
   
  /**
    * Log a message at the ERROR level according to the specified format
@@ -400,6 +400,9 @@ public interface Logger {
    * @param t the exception (throwable) to log
    */
   public void error(String msg, Throwable t);
+
+public void error(String string);
+
 
 
 }

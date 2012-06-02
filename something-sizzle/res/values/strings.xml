@@ -19,6 +19,7 @@
      <string name="peerserverservice">Peer Server</string>
      <string name="discoverservice">Discover Server</string>
      <string name="peerservice">Peer Service</string>
+     <string name="httpservice">Http Service</string>
     
     
     <string name="jetty_started">Jetty started</string>
